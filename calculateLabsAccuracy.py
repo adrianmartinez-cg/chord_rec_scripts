@@ -172,7 +172,8 @@ def getEnharmonicNotes():
     'G': 'G',
     'A': 'A',
     'B': 'B',
-    'N': 'N'
+    'N': 'N',
+    '': ''
     }
 
 def extractChordComponents(chordLabel):
@@ -204,16 +205,41 @@ def extractChordComponents(chordLabel):
     else:
         return {'root': '', 'type': '', 'extension': '', 'alt_root': ''}
 
-def compareChords(label1,label2, relaxExtension = False, relaxType = False):
-    chord1Components = extractChordComponents(label1)
-    chord2Components = extractChordComponents(label2)
-    equalRoots = chord1Components['root'] == chord2Components['root'] or chord1Components['alt_root'] == chord2Components['root']
+def compareChords(label1,label2, minRightExtensions = 0.3, relaxType = False):
+    #label2 = correct
+    chordsDict = getChordsDict()
+    enharmonicNotes = getEnharmonicNotes()
+    c1comps = label1.split(":")
+    c2comps = label2.split(":")
+    if len(c1comps) > 1:
+        root1, annotation1 = c1comps
+    else:
+        root1 = c1comps[0]
+        annotation1 = 'maj'
+    altroot1 = enharmonicNotes[root1]
+    if len(c2comps) > 1:
+        root2, annotation2 = c2comps
+    else:
+        root2 = c2comps
+        annotation2 = 'maj'
+    chord1Components = chordsDict[annotation1]
+    chord2Components = chordsDict[annotation2]
     equalTypes = chord1Components['type'] == chord2Components['type']
-    equalExtensions = chord1Components['extension'] == chord2Components['extension']
+    equalRoots = root1 == root2 or altroot1 == root2
+    chord1extensions = chord1Components['extensions']
+    chord2extensions = chord1Components['extensions']
+    rightExtensions = 0
+    for extension in chord2extensions:
+        if extension in chord1extensions:
+            rightExtensions += 1
+    if len(chord2extensions) > 0:
+        rightExtensionsPerc = rightExtensions / len(chord2extensions)
+    else:
+        rightExtensionsPerc = 1
     equal = True
     if not equalRoots:
         equal = False
-    if not relaxExtension and not equalExtensions:
+    if rightExtensionsPerc < minRightExtensions:
         equal = False
     if not relaxType and not equalTypes:
         equal = False
@@ -325,92 +351,7 @@ def shiftFiles(expectedFolder, resultFolder, outputFolder):
 
 ## CALCULATE PRECISION OF LAB FILES FUNCTIONS #########################
 
-def compareIntervals(interval1, interval2, threshold):
-    # Calculate the intersection of the two intervals
-    intersectionStart = max(interval1[0], interval2[0])
-    intersectionEnd = min(interval1[1], interval2[1])
-
-    # If the intervals do not intersect, return False
-    if intersectionStart >= intersectionEnd:
-        return False
-
-    # Calculate the length of the intersection
-    intersectionLength = intersectionEnd - intersectionStart
-
-    # Calculate the length of the first interval
-    interval1Length = interval1[1] - interval1[0]
-
-    # If the length of the intersection is greater or equal to the threshold percentage of the length of the first interval, return True
-    if intersectionLength >= threshold * interval1Length:
-        return True
-
-    # Otherwise, return False
-    return False
-
-def calculateAccuracy(predictedFile, expectedFile, threshold=0.5,relaxExtension = False, relaxType = False):
-    # Function to read labels from a file
-    def readLabelsFromFile(file):
-        with open(file, 'r') as f:
-            lines = f.readlines()
-            labels = []
-            for line in lines:
-                parts = line.strip().split()
-                start = float(parts[0])
-                end = float(parts[1])
-                label = parts[2]
-                labels.append((start, end, label))
-        return labels
-    # Read predicted and correct labels from files
-    predictedLabels = readLabelsFromFile(predictedFile)
-    expectedLabels = readLabelsFromFile(expectedFile)
-    
-    # Counter for correct predictions
-    correctPredictions = 0
-
-    possibleLabels = getEnharmonicNotes()
-    
-    # Iterate over all predicted labels
-    for predicted in predictedLabels:
-        startPredicted, endPredicted, labelPredicted = predicted
-        if extractChordComponents(labelPredicted)['root'] not in possibleLabels: continue
-        # Check if the predicted label matches any correct label
-        for correct in expectedLabels:
-            startCorrect, endCorrect, labelCorrect = correct
-            if compareChords(labelPredicted,labelCorrect,relaxExtension,relaxType):
-                # Check if start and end are within tolerance
-                if compareIntervals([startPredicted,endPredicted],[startCorrect,endCorrect],threshold):
-                    correctPredictions += 1
-                    break  # If found a correct prediction, exit inner loop
-            if startCorrect > endPredicted: # nothing more to search
-                break                 
-    # Calculate accuracy
-    accuracy = correctPredictions / len(predictedLabels) if predictedLabels else 0.0
-    return accuracy
-
-def getMeanColoringAccuracy(expectedFolder, predictedFolder,relaxExtension = False, relaxType = False):
-    files_ = []
-    for dir, subDir, files in os.walk(expectedFolder):
-        for file in files:
-            if os.path.splitext(file)[1] == ".lab":
-                if os.path.exists(os.path.join(predictedFolder,file)):
-                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),relaxExtension,relaxType),file))
-    files_.sort(reverse=True)
-    return files_,np.mean(np.array([x[0] for x in files_]))
-
-## OTHER ##############################################################
-
-def cleanNames(expectedFolder):
-    for dir, subDir, files in os.walk(expectedFolder):
-        for file in files:
-            if os.path.splitext(file)[1] == ".lab":
-                tokens = file.split("_")
-                tokens = tokens[2:]
-                newFileName = ' '.join(tokens)
-                os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
-
-############ New calcAccuracy function
-
-def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,relaxExtension = False, relaxType = False):
+def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,minRightExtensions = 0.3, relaxType = False):
     def readLabelsFromFile(file,addPredictedLabel=False):
         firstTimeInstant = 0
         lastTimeInstant = 0
@@ -461,31 +402,46 @@ def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,relaxExtension = 
         if actualTime == 0 and anteriorTime == 0 : continue # nothing to compute
         expectedChordLabel = getCurrentChordInTimeline(actualTime,expectedTimeLine)
         predictedChordLabel = getCurrentChordInTimeline(actualTime,predictedTimeLine)
-        if compareChords(expectedChordLabel,predictedChordLabel,relaxExtension,relaxType):
+        if compareChords(predictedChordLabel,expectedChordLabel,minRightExtensions,relaxType):
             coloredLength += actualTime - anteriorTime
     return coloredLength / fullColoredLength
 
-#############################
+
+def getMeanColoringAccuracy(expectedFolder, predictedFolder,minRightExtensions=0.3, relaxType = False):
+    files_ = []
+    for dir, subDir, files in os.walk(expectedFolder):
+        for file in files:
+            if os.path.splitext(file)[1] == ".lab":
+                if os.path.exists(os.path.join(predictedFolder,file)):
+                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),minRightExtensions,relaxType),file))
+    files_.sort(reverse=True)
+    return files_,np.mean(np.array([x[0] for x in files_]))
+
+## OTHER ##############################################################
+
+def cleanNames(expectedFolder):
+    for dir, subDir, files in os.walk(expectedFolder):
+        for file in files:
+            if os.path.splitext(file)[1] == ".lab":
+                tokens = file.split("_")
+                tokens = tokens[2:]
+                newFileName = ' '.join(tokens)
+                os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
 
 dir = os.getcwd()
-expectedLabelsDir = os.path.join(dir,'pop909_expected')
-shiftedLabelsDir = os.path.join(dir,'queen_lab_expected_shifted_selected')
-predictedLabelsDir = os.path.join(dir,'pop909_predicted')
-
-chordsDict = getChordsDict()
-allChordsExpected = getAllChordLabelsInFolder(expectedLabelsDir)
-allChordsPredicted = getAllChordLabelsInFolder(predictedLabelsDir)
+expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_expected'))
+predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_predicted'))
 
 #chords = ['A', 'A#:min', 'Db', 'Db:minmaj7','F#:aug7', 'F:7','G:dim6','B:min7/b7']
 #for c in chords:
     #print(extractChordComponents(c))
-#file = "You're My Best Friend.lab"
-#print(getColoringAccuracy(os.path.join(shiftedLabelsDir,file),os.path.join(predictedLabelsDir,file)))
+#file = "001.lab"
+#print(getColoringAccuracy(os.path.join(expectedLabelsDir,file),os.path.join(predictedLabelsDir,file)))
 
 #createChordChart(os.path.join(predictedLabelsDir,file))
 #createChordChart(os.path.join(expectedLabelsDir,file))
 
-'''
+#'''
 files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir)
 print(f'####### {len(files)} Files #########')
 map = {file[1]:file[0] for file in files if file[0] < 0.6}

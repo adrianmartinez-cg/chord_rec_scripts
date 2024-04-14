@@ -24,12 +24,12 @@ def getChordsDict():
     'aug(7)': {'type': 'aug', 'extensions': [11], 'bass': 0}, 
     'aug(b7)': {'type': 'aug', 'extensions': [10], 'bass': 0},
     'dim': {'type': 'dim', 'extensions': [], 'bass': 0},  
-    'dim/7': {'type': 'dim', 'extensions': [11], 'bass': 11}, 
+    'dim/7': {'type': 'dim', 'extensions': [11], 'bass': 11}, #
     'dim/b2': {'type': 'dim', 'extensions': [1], 'bass': 1}, 
     'dim/b3': {'type': 'dim', 'extensions': [], 'bass': 3}, 
     'dim/b5': {'type': 'dim', 'extensions': [], 'bass': 6}, 
-    'dim/b7': {'type': 'dim', 'extensions': [10], 'bass': 10},
-    'dim7': {'type': 'dim', 'extensions': [10], 'bass': 0},  
+    'dim/b7': {'type': 'dim', 'extensions': [10], 'bass': 10}, #
+    'dim7': {'type': 'dim', 'extensions': [9], 'bass': 0},  
     'hdim7': {'type': 'dim', 'extensions': [10], 'bass': 0},
     'hdim7/4': {'type': 'dim', 'extensions': [5, 10], 'bass': 5},
     'hdim7/b3': {'type': 'dim', 'extensions': [10], 'bass': 3},
@@ -76,18 +76,18 @@ def getChordsDict():
     'maj9(13)': {'type': 'maj', 'extensions': [2, 9], 'bass': 0},
     'maj9/3': {'type': 'maj', 'extensions': [2], 'bass': 4},
     'min': {'type': 'min', 'extensions': [], 'bass': 0},
-    'min6': {'type': 'min', 'extensions': [8], 'bass': 0},
+    'min6': {'type': 'min', 'extensions': [9], 'bass': 0},
     'min7': {'type': 'min', 'extensions': [10], 'bass': 0},
     'min(11)': {'type': 'min', 'extensions': [5], 'bass': 0},
     'min(2)/2': {'type': 'min', 'extensions': [2], 'bass': 2},
-    'min(6)/6': {'type': 'min', 'extensions': [8], 'bass': 8},
+    'min(6)/6': {'type': 'min', 'extensions': [9], 'bass': 9},
     'min(9)': {'type': 'min', 'extensions': [2], 'bass': 0}, 
     'min(9)/5': {'type': 'min', 'extensions': [2], 'bass': 7},
     'min(9)/b3': {'type': 'min', 'extensions': [2], 'bass': 3},
     'min/2': {'type': 'min', 'extensions': [2], 'bass': 2}, 
     'min/4': {'type': 'min', 'extensions': [5], 'bass': 5},
     'min/5': {'type': 'min', 'extensions': [], 'bass': 7},
-    'min/6': {'type': 'min', 'extensions': [8], 'bass': 8},
+    'min/6': {'type': 'min', 'extensions': [9], 'bass': 9},
     'min/7': {'type': 'min', 'extensions': [11], 'bass': 11},
     'min/b3': {'type': 'min', 'extensions': [], 'bass': 3},
     'min/b6': {'type': 'min', 'extensions': [8], 'bass': 8},
@@ -96,10 +96,10 @@ def getChordsDict():
     'min11/5': {'type': 'min', 'extensions': [5], 'bass': 7},
     'min11/b3': {'type': 'min', 'extensions': [5], 'bass': 3},
     'min11/b7': {'type': 'min', 'extensions': [5], 'bass': 10},
-    'min6(7)': {'type': 'min', 'extensions': [8, 11], 'bass': 0},
-    'min6/2': {'type': 'min', 'extensions': [2, 8], 'bass': 2}, 
-    'min6/5': {'type': 'min', 'extensions': [8], 'bass': 7},
-    'min6/b3': {'type': 'min', 'extensions': [8], 'bass': 3},
+    'min6(7)': {'type': 'min', 'extensions': [9, 10], 'bass': 0},
+    'min6/2': {'type': 'min', 'extensions': [2, 9], 'bass': 2}, 
+    'min6/5': {'type': 'min', 'extensions': [9], 'bass': 7},
+    'min6/b3': {'type': 'min', 'extensions': [9], 'bass': 3},
     'min7(11)': {'type': 'min', 'extensions': [5, 10], 'bass': 0},
     'min7(13)': {'type': 'min', 'extensions': [9, 10], 'bass': 0},
     'min7(4)/4': {'type': 'min', 'extensions': [5, 10], 'bass': 5},
@@ -107,7 +107,7 @@ def getChordsDict():
     'min7/2': {'type': 'min', 'extensions': [2, 10], 'bass': 2},
     'min7/4': {'type': 'min', 'extensions': [5, 10], 'bass': 5},
     'min7/5': {'type': 'min', 'extensions': [10], 'bass': 7},
-    'min7/6': {'type': 'min', 'extensions': [8, 10], 'bass': 8},
+    'min7/6': {'type': 'min', 'extensions': [9, 10], 'bass': 9},
     'min7/b2': {'type': 'min', 'extensions': [1, 10], 'bass': 1},
     'min7/b3': {'type': 'min', 'extensions': [10], 'bass': 3},
     'min7/b7': {'type': 'min', 'extensions': [10], 'bass': 10},
@@ -205,27 +205,26 @@ def extractChordComponents(chordLabel):
     else:
         return {'root': '', 'type': '', 'extension': '', 'alt_root': ''}
 
-def compareChords(label1,label2, minRightExtensions = 0.3, relaxType = False):
-    #label2 = correct
+def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 0.3, relaxType = False):
     chordsDict = getChordsDict()
     enharmonicNotes = getEnharmonicNotes()
-    c1comps = label1.split(":")
-    c2comps = label2.split(":")
-    if len(c1comps) > 1:
-        root1, annotation1 = c1comps
+    predictedChordComponents = predictedLabel.split(":")
+    expectedChordComponents = expectedLabel.split(":")
+    if len(predictedChordComponents) > 1:
+        rootPredicted, annotationPredicted = predictedChordComponents
     else:
-        root1 = c1comps[0]
-        annotation1 = 'maj'
-    altroot1 = enharmonicNotes[root1]
-    if len(c2comps) > 1:
-        root2, annotation2 = c2comps
+        rootPredicted = predictedChordComponents[0]
+        annotationPredicted = 'maj'
+    altrootPredicted = enharmonicNotes[rootPredicted]
+    if len(expectedChordComponents) > 1:
+        rootExpected, annotationExpected = expectedChordComponents
     else:
-        root2 = c2comps
-        annotation2 = 'maj'
-    chord1Components = chordsDict[annotation1]
-    chord2Components = chordsDict[annotation2]
+        rootExpected = expectedChordComponents
+        annotationExpected = 'maj'
+    chord1Components = chordsDict[annotationPredicted]
+    chord2Components = chordsDict[annotationExpected]
     equalTypes = chord1Components['type'] == chord2Components['type']
-    equalRoots = root1 == root2 or altroot1 == root2
+    equalRoots = rootPredicted == rootExpected or altrootPredicted == rootExpected
     chord1extensions = chord1Components['extensions']
     chord2extensions = chord1Components['extensions']
     rightExtensions = 0
@@ -243,6 +242,11 @@ def compareChords(label1,label2, minRightExtensions = 0.3, relaxType = False):
         equal = False
     if not relaxType and not equalTypes:
         equal = False
+    if not equal:
+        if expectedLabel not in errorsDict:
+            errorsDict[expectedLabel] = set(predictedLabel)
+        else:
+            errorsDict[expectedLabel].add(predictedLabel) 
     return equal
 
 def createChordChart(file_path):
@@ -351,7 +355,7 @@ def shiftFiles(expectedFolder, resultFolder, outputFolder):
 
 ## CALCULATE PRECISION OF LAB FILES FUNCTIONS #########################
 
-def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,minRightExtensions = 0.3, relaxType = False):
+def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,errorsDict,minRightExtensions = 0.3, relaxType = False):
     def readLabelsFromFile(file,addPredictedLabel=False):
         firstTimeInstant = 0
         lastTimeInstant = 0
@@ -402,18 +406,18 @@ def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,minRightExtension
         if actualTime == 0 and anteriorTime == 0 : continue # nothing to compute
         expectedChordLabel = getCurrentChordInTimeline(actualTime,expectedTimeLine)
         predictedChordLabel = getCurrentChordInTimeline(actualTime,predictedTimeLine)
-        if compareChords(predictedChordLabel,expectedChordLabel,minRightExtensions,relaxType):
+        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,minRightExtensions,relaxType):
             coloredLength += actualTime - anteriorTime
     return coloredLength / fullColoredLength
 
 
-def getMeanColoringAccuracy(expectedFolder, predictedFolder,minRightExtensions=0.3, relaxType = False):
+def getMeanColoringAccuracy(expectedFolder, predictedFolder,errorsDict,minRightExtensions=0.3, relaxType = False):
     files_ = []
     for dir, subDir, files in os.walk(expectedFolder):
         for file in files:
             if os.path.splitext(file)[1] == ".lab":
                 if os.path.exists(os.path.join(predictedFolder,file)):
-                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),minRightExtensions,relaxType),file))
+                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,minRightExtensions,relaxType),file))
     files_.sort(reverse=True)
     return files_,np.mean(np.array([x[0] for x in files_]))
 
@@ -431,7 +435,7 @@ def cleanNames(expectedFolder):
 dir = os.getcwd()
 expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_expected'))
 predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_predicted'))
-
+errorsDict = {}
 #chords = ['A', 'A#:min', 'Db', 'Db:minmaj7','F#:aug7', 'F:7','G:dim6','B:min7/b7']
 #for c in chords:
     #print(extractChordComponents(c))
@@ -442,7 +446,7 @@ predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_tr
 #createChordChart(os.path.join(expectedLabelsDir,file))
 
 #'''
-files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir)
+files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict)
 print(f'####### {len(files)} Files #########')
 map = {file[1]:file[0] for file in files if file[0] < 0.6}
 print(map)

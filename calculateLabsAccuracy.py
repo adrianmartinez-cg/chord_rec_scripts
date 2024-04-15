@@ -205,6 +205,23 @@ def extractChordComponents(chordLabel):
     else:
         return {'root': '', 'type': '', 'extension': '', 'alt_root': ''}
 
+def compareExtensions(predictedExtensions, expectedExtensions):
+    if len(expectedExtensions) == 0:
+        # for len = 0,1,2 : scores 1 ,0.5, 0.25 
+        return 2 ** (-len(predictedExtensions))
+    expectedExtensions = set(expectedExtensions)
+    predictedExtensions = set(predictedExtensions)
+
+    # Calculate intersection and difference
+    correct = expectedExtensions.intersection(predictedExtensions)
+    incorrect = predictedExtensions.difference(expectedExtensions)
+    missing = expectedExtensions.difference(predictedExtensions)
+
+    # Calculates score
+    score = len(correct) / (len(correct) + len(incorrect) + len(missing))
+
+    return score
+
 def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 0.3, relaxType = False):
     chordsDict = getChordsDict()
     enharmonicNotes = getEnharmonicNotes()
@@ -221,24 +238,17 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 
     else:
         rootExpected = expectedChordComponents
         annotationExpected = 'maj'
-    chord1Components = chordsDict[annotationPredicted]
-    chord2Components = chordsDict[annotationExpected]
-    equalTypes = chord1Components['type'] == chord2Components['type']
+    predictedChordInfo = chordsDict[annotationPredicted]
+    expectedChordInfo = chordsDict[annotationExpected]
+    equalTypes = predictedChordInfo['type'] == expectedChordInfo['type']
     equalRoots = rootPredicted == rootExpected or altrootPredicted == rootExpected
-    chord1extensions = chord1Components['extensions']
-    chord2extensions = chord1Components['extensions']
-    rightExtensions = 0
-    for extension in chord2extensions:
-        if extension in chord1extensions:
-            rightExtensions += 1
-    if len(chord2extensions) > 0:
-        rightExtensionsPerc = rightExtensions / len(chord2extensions)
-    else:
-        rightExtensionsPerc = 1
+    predictedChordExtensions = predictedChordInfo['extensions']
+    expectedChordExtensions = expectedChordInfo['extensions']
+    extensionsScore = compareExtensions(predictedChordExtensions,expectedChordExtensions)
     equal = True
     if not equalRoots:
         equal = False
-    if rightExtensionsPerc < minRightExtensions:
+    if extensionsScore < minRightExtensions:
         equal = False
     if not relaxType and not equalTypes:
         equal = False
@@ -433,8 +443,10 @@ def cleanNames(expectedFolder):
                 os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
 
 dir = os.getcwd()
-expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_expected'))
-predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados','comp_transformer','pop909_predicted'))
+resultsFolder = 'comp_transformer'
+datasetFolder = 'pop909'
+expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_expected'))
+predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_predicted'))
 errorsDict = {}
 #chords = ['A', 'A#:min', 'Db', 'Db:minmaj7','F#:aug7', 'F:7','G:dim6','B:min7/b7']
 #for c in chords:

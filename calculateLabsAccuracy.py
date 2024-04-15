@@ -254,9 +254,9 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 
         equal = False
     if not equal:
         if expectedLabel not in errorsDict:
-            errorsDict[expectedLabel] = set(predictedLabel)
+            errorsDict[expectedLabel] = [predictedLabel]
         else:
-            errorsDict[expectedLabel].add(predictedLabel) 
+            errorsDict[expectedLabel].append(predictedLabel)
     return equal
 
 def createChordChart(file_path):
@@ -442,6 +442,10 @@ def cleanNames(expectedFolder):
                 newFileName = ' '.join(tokens)
                 os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
 
+def removeRepeatedLabels(errorsDict):
+    for key in errorsDict:
+        errorsDict[key] = set(errorsDict[key])
+
 dir = os.getcwd()
 resultsFolder = 'comp_transformer'
 datasetFolder = 'pop909'
@@ -458,12 +462,15 @@ errorsDict = {}
 #createChordChart(os.path.join(expectedLabelsDir,file))
 
 #'''
-files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict)
+files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict,0.24)
 print(f'####### {len(files)} Files #########')
 map = {file[1]:file[0] for file in files if file[0] < 0.6}
 print(map)
 print('\n####### Accuracy (Expected) #########')
 print(accuracy)
+removeRepeatedLabels(errorsDict)
+for expectedLabel in errorsDict:
+  print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
 #'''
 
 #chords = ['A#','B','B:7','B:min7','A#:minmaj7','C:aug']

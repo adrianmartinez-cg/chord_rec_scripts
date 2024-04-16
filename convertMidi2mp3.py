@@ -23,4 +23,11 @@ def convert_mid_to_mp3(input_folder, output_folder):
 
 # Use the function
 dir = os.getcwd()
-convert_mid_to_mp3(os.path.join('pop909_audio2'), os.path.join('pop909_audio_mp3'))
+convert_mid_to_mp3(
+    os.path.abspath(
+        os.path.join(dir,'..','repos','BTC-ISMIR19','pop909_audio3')
+        ), 
+        os.path.abspath(
+            os.path.join(dir,'..','repos','BTC-ISMIR19','pop909_audio_mp3')
+        )
+    )

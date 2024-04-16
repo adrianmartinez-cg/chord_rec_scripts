@@ -450,10 +450,17 @@ def cleanNames(expectedFolder):
                 newFileName = ' '.join(tokens)
                 os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
 
-def removeRepeatedLabels(errorsDict):
+def getTypeErrors(errorsDict):
+    def countRepetitions(elem):
+      map = {}
+      for annotation in elem:
+        map[annotation] = elem.count(annotation)
+      map['count'] = len(elem)
+      return map
+
     keys = []
     annotationsDict = {}
-    finalDict = {}
+    countingDict = {}
     for key in errorsDict:
         if extractAnnotation(key) not in annotationsDict:
           annotationsDict[extractAnnotation(key)] = []
@@ -461,11 +468,22 @@ def removeRepeatedLabels(errorsDict):
             annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
     for key in annotationsDict:
       keys.append(key)
-      annotationsDict[key] = set(annotationsDict[key])
+      annotationsDict[key] = countRepetitions(annotationsDict[key])
     keys.sort()
     for key in keys:
-      finalDict[key] = annotationsDict[key]
-    return finalDict
+      countingDict[key] = annotationsDict[key]
+    for key in countingDict:
+      temp = {}
+      subtract = 0
+      for elem in countingDict[key]:
+        if elem != key:
+          temp[elem] = countingDict[key][elem]
+        else:
+          subtract = countingDict[key][elem]
+      count = countingDict[key]['count'] - subtract
+      countingDict[key] = temp
+      countingDict[key]['count'] = count
+    return countingDict
 
 dir = os.getcwd()
 resultsFolder = 'comp_transformer'
@@ -489,7 +507,7 @@ map = {file[1]:file[0] for file in files if file[0] < 0.6}
 print(map)
 print('\n####### Accuracy (Expected) #########')
 print(accuracy)
-errorsDict = removeRepeatedLabels(errorsDict)
+typeErrorsDict = getTypeErrors(errorsDict)
 for expectedLabel in errorsDict:
   print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
 #'''

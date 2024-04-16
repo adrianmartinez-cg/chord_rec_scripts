@@ -131,6 +131,14 @@ def getChordsDict():
     'sus4/4': {'type': 'sus', 'extensions': [5], 'bass': 5}
     }
 
+def extractAnnotation(chordLabel):
+  comps = chordLabel.split(":")
+  if len(comps) > 1:
+    _,annotation = comps
+  else:
+    annotation = 'maj'
+  return annotation
+
 def getAllChordLabelsInFolder(labelsFolder):
     chords = {}
     for file in os.listdir(labelsFolder):
@@ -443,8 +451,21 @@ def cleanNames(expectedFolder):
                 os.rename(os.path.join(expectedFolder,file),os.path.join(expectedFolder,newFileName))
 
 def removeRepeatedLabels(errorsDict):
+    keys = []
+    annotationsDict = {}
+    finalDict = {}
     for key in errorsDict:
-        errorsDict[key] = set(errorsDict[key])
+        if extractAnnotation(key) not in annotationsDict:
+          annotationsDict[extractAnnotation(key)] = []
+        for elem in errorsDict[key]:
+            annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
+    for key in annotationsDict:
+      keys.append(key)
+      annotationsDict[key] = set(annotationsDict[key])
+    keys.sort()
+    for key in keys:
+      finalDict[key] = annotationsDict[key]
+    return finalDict
 
 dir = os.getcwd()
 resultsFolder = 'comp_transformer'
@@ -468,7 +489,7 @@ map = {file[1]:file[0] for file in files if file[0] < 0.6}
 print(map)
 print('\n####### Accuracy (Expected) #########')
 print(accuracy)
-removeRepeatedLabels(errorsDict)
+errorsDict = removeRepeatedLabels(errorsDict)
 for expectedLabel in errorsDict:
   print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
 #'''

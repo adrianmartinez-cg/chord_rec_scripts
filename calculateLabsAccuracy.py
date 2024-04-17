@@ -72,6 +72,7 @@ def getChordsQualities():
       'maj7(9)/7': 'maj7(9)',
       'maj7/2': 'maj7(9)',
       'maj7/3': 'maj7',
+      'maj7/4': 'maj7(11)',
       'maj7/5': 'maj7',
       'maj7/7': 'maj7',
       'maj9': 'maj9',
@@ -118,6 +119,7 @@ def getChordsQualities():
       'min9/b3': 'min9',
       'min9/b7': 'min7(9)',
       'minmaj7': 'minmaj7',
+      'minmaj7/5': 'minmaj7',
       'minmaj7/7': 'minmaj7',
       'sus2': 'sus2',
       'sus2(4)': 'sus2',
@@ -245,6 +247,7 @@ def getChordsDict():
     'min9/b3': {'type': 'min', 'extensions': [2], 'bass': 3},
     'min9/b7': {'type': 'min', 'extensions': [2], 'bass': 10},
     'minmaj7': {'type': 'min', 'extensions': [11], 'bass': 0},
+    'minmaj7/5': {'type': 'min', 'extensions': [11], 'bass': 7},
     'minmaj7/7': {'type': 'min', 'extensions': [11], 'bass': 11},
     'sus2': {'type': 'sus', 'extensions': [2], 'bass': 0},
     'sus2(4)': {'type': 'sus', 'extensions': [2, 5], 'bass': 0},
@@ -314,35 +317,6 @@ def getEnharmonicNotes():
     '': ''
     }
 
-def extractChordComponents(chordLabel):
-    enharmonicNotes = getEnharmonicNotes()
-    # Definir a expressão regular
-    pattern = r'([A-Ga-gN][#b]?)(?::(minmaj|min|aug|dim|sus|)(\d*)?)?(?:/\\w+)?'
-    
-    # Aplicar a expressão regular na string
-    result = re.match(pattern, chordLabel)
-    
-    # Se houver um resultado
-    if result:
-        root= result.group(1)  
-        type = result.group(2)  # Tipo de acorde (opcional)
-        extension = result.group(3)  # Extensão do acorde (opcional)
-         # Se não houver tipo de acorde, definir como "maj"
-        if not type:
-            type = "maj"
-        
-        # Se não houver extensão no acorde, definir como uma string vazia
-        if not extension:
-            extension = ""
-        info = {}
-        info['root'] = root
-        info['type'] = type
-        info['extension'] = extension
-        info['alt_root'] = enharmonicNotes[root]
-        return info
-    else:
-        return {'root': '', 'type': '', 'extension': '', 'alt_root': ''}
-
 def compareExtensions(predictedExtensions, expectedExtensions):
     if len(expectedExtensions) == 0:
         # for len = 0,1,2 : scores 1 ,0.5, 0.25 
@@ -360,7 +334,8 @@ def compareExtensions(predictedExtensions, expectedExtensions):
 
     return score
 
-def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 0.3, relaxType = False):
+
+def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minRightExtensions = 0.3, relaxType = False):
     chordsDict = getChordsDict()
     enharmonicNotes = getEnharmonicNotes()
     predictedChordComponents = predictedLabel.split(":")
@@ -395,6 +370,11 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,minRightExtensions = 
             errorsDict[expectedLabel] = [predictedLabel]
         else:
             errorsDict[expectedLabel].append(predictedLabel)
+    else:
+      if expectedLabel not in successDict:
+        successDict[expectedLabel] = 1
+      else:
+        successDict[expectedLabel] += 1
     return equal
 
 def createChordChart(file_path):
@@ -503,7 +483,7 @@ def shiftFiles(expectedFolder, resultFolder, outputFolder):
 
 ## CALCULATE PRECISION OF LAB FILES FUNCTIONS #########################
 
-def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,errorsDict,minRightExtensions = 0.3, relaxType = False):
+def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict,minRightExtensions = 0.3, relaxType = False):
     def readLabelsFromFile(file,addPredictedLabel=False):
         firstTimeInstant = 0
         lastTimeInstant = 0
@@ -559,13 +539,13 @@ def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,errorsDict,minRig
     return coloredLength / fullColoredLength
 
 
-def getMeanColoringAccuracy(expectedFolder, predictedFolder,errorsDict,minRightExtensions=0.3, relaxType = False):
+def getMeanColoringAccuracy(expectedFolder, predictedFolder,errorsDict,successDict,minRightExtensions=0.3, relaxType = False):
     files_ = []
     for dir, subDir, files in os.walk(expectedFolder):
         for file in files:
             if os.path.splitext(file)[1] == ".lab":
                 if os.path.exists(os.path.join(predictedFolder,file)):
-                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,minRightExtensions,relaxType),file))
+                    files_.append((getColoringAccuracy(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,successDict,minRightExtensions,relaxType),file))
     files_.sort(reverse=True)
     return files_,np.mean(np.array([x[0] for x in files_]))
 
@@ -583,24 +563,29 @@ def cleanNames(expectedFolder):
 def getTypeErrors(errorsDict):
     def countRepetitions(elem):
       map = {}
-      for annotation in elem:
-        map[annotation] = elem.count(annotation)
       map['count'] = len(elem)
+      for annotation in elem:
+        if annotation not in map:
+          map[annotation] = 1
+        else:
+          map[annotation] += 1
       return map
 
-    keys = []
+    chordQualities = getChordsQualities()
+    annotationsDictKeys = []
     annotationsDict = {}
     countingDict = {}
+    simplifiedCountingDict = {}
     for key in errorsDict:
         if extractAnnotation(key) not in annotationsDict:
           annotationsDict[extractAnnotation(key)] = []
         for elem in errorsDict[key]:
             annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
     for key in annotationsDict:
-      keys.append(key)
+      annotationsDictKeys.append(key)
       annotationsDict[key] = countRepetitions(annotationsDict[key])
-    keys.sort()
-    for key in keys:
+    annotationsDictKeys.sort()
+    for key in annotationsDictKeys:
       countingDict[key] = annotationsDict[key]
     for key in countingDict:
       temp = {}
@@ -613,7 +598,27 @@ def getTypeErrors(errorsDict):
       count = countingDict[key]['count'] - subtract
       countingDict[key] = temp
       countingDict[key]['count'] = count
-    return countingDict
+    for key in countingDict:
+      for elem in countingDict[key]:
+        if elem == 'count': continue
+        if chordQualities[key] not in simplifiedCountingDict: simplifiedCountingDict[chordQualities[key]] = {}
+        if chordQualities[elem] not in simplifiedCountingDict[chordQualities[key]]: simplifiedCountingDict[chordQualities[key]][chordQualities[elem]] = 0
+        simplifiedCountingDict[chordQualities[key]][chordQualities[elem]] += countingDict[key][elem]
+      simplifiedCountingDict[chordQualities[key]]['count'] = 0
+      for elem in simplifiedCountingDict[chordQualities[key]]:
+        if elem != 'count':
+          simplifiedCountingDict[chordQualities[key]]['count'] += simplifiedCountingDict[chordQualities[key]][elem]
+    return countingDict,simplifiedCountingDict
+
+def simplifySuccessDict(successDict):
+  simplified = {}
+  chordQualities = getChordsQualities()
+  for key in successDict:
+    if chordQualities[extractAnnotation(key)] not in simplified:
+      simplified[chordQualities[extractAnnotation(key)]] = successDict[key]
+    else:
+      simplified[chordQualities[extractAnnotation(key)]] += successDict[key]
+  return simplified
 
 dir = os.getcwd()
 resultsFolder = 'comp_transformer'
@@ -630,17 +635,17 @@ errorsDict = {}
 #createChordChart(os.path.join(predictedLabelsDir,file))
 #createChordChart(os.path.join(expectedLabelsDir,file))
 
-#'''
+'''
 files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict,0.24)
 print(f'####### {len(files)} Files #########')
 map = {file[1]:file[0] for file in files if file[0] < 0.6}
 print(map)
 print('\n####### Accuracy (Expected) #########')
 print(accuracy)
-typeErrorsDict = getTypeErrors(errorsDict)
+typeErrors, simplifiedTypeErrors = getTypeErrors(errorsDict)
 for expectedLabel in errorsDict:
   print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
-#'''
+'''
 
 #chords = ['A#','B','B:7','B:min7','A#:minmaj7','C:aug']
 #for c in chords:

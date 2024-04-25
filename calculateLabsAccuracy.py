@@ -406,7 +406,7 @@ def createChordChart(file_path):
     for i in range(len(times) - 1):
         start_time, end_time, chord = times[i], times[i + 1], chords[i]
         ax.add_patch(plt.Rectangle((start_time, 0), end_time - start_time, 1, color="lightblue"))
-        ax.text((start_time + end_time) / 2, 0.5, chord, ha="center", va="center", fontsize=6)
+        ax.text((start_time + end_time) / 2, 0.5, chord, ha="center", va="center", fontsize=10)
 
         # Add a dashed line for time marker
         ax.plot([end_time, end_time], [0, 1], linestyle="--", color="gray")
@@ -534,7 +534,7 @@ def getColoringAccuracy(expectedLabelsFile,predictedLabelsFile,errorsDict,succes
         if actualTime == 0 and anteriorTime == 0 : continue # nothing to compute
         expectedChordLabel = getCurrentChordInTimeline(actualTime,expectedTimeLine)
         predictedChordLabel = getCurrentChordInTimeline(actualTime,predictedTimeLine)
-        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,minRightExtensions,relaxType):
+        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,successDict,minRightExtensions,relaxType):
             coloredLength += actualTime - anteriorTime
     return coloredLength / fullColoredLength
 
@@ -626,14 +626,6 @@ datasetFolder = 'pop909'
 expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_expected'))
 predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_predicted'))
 errorsDict = {}
-#chords = ['A', 'A#:min', 'Db', 'Db:minmaj7','F#:aug7', 'F:7','G:dim6','B:min7/b7']
-#for c in chords:
-    #print(extractChordComponents(c))
-#file = "001.lab"
-#print(getColoringAccuracy(os.path.join(expectedLabelsDir,file),os.path.join(predictedLabelsDir,file)))
-
-#createChordChart(os.path.join(predictedLabelsDir,file))
-#createChordChart(os.path.join(expectedLabelsDir,file))
 
 '''
 files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict,0.24)
@@ -645,7 +637,10 @@ print(accuracy)
 typeErrors, simplifiedTypeErrors = getTypeErrors(errorsDict)
 for expectedLabel in errorsDict:
   print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
-'''
+#'''
+
+#createChordChart(os.path.join(dir,'example1.lab'))
+#createChordChart(os.path.join(dir,'example2.lab'))
 
 #chords = ['A#','B','B:7','B:min7','A#:minmaj7','C:aug']
 #for c in chords:
@@ -653,3 +648,25 @@ for expectedLabel in errorsDict:
 #shiftFiles(expectedLabelsDir,predictedLabelsDir,'queen_lab_expected_shifted')
 #file = "Somebody To Love.lab"
 #shiftIntervals(os.path.join(expectedLabelsDir,file),os.path.join(shiftedLabelsDir,file),shift=2.52)
+
+
+####################### Test Cases
+testCasesFolder = 'test_cases_lab'
+testCasesExpected = os.path.join(dir,testCasesFolder,'expected')
+testCasesPredicted = os.path.join(dir,testCasesFolder,'predicted')
+file = '1.lab'
+expectedFile = os.path.join(testCasesExpected,file)
+predictedFile = os.path.join(testCasesPredicted,file)
+testErrorsDict = {}
+testSuccessDict = {}
+testAcc = getColoringAccuracy(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0)
+print(f'Min Score [0] Accuracy: {testAcc}')
+
+testAcc = getColoringAccuracy(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0.25)
+print(f'Min Score [0.25] Accuracy: {testAcc}')
+
+testAcc = getColoringAccuracy(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0.5)
+print(f'Min Score [0.5] Accuracy: {testAcc}')
+
+testAcc = getColoringAccuracy(expectedFile,predictedFile,testErrorsDict,testSuccessDict,1)
+print(f'Min Score [1] Accuracy: {testAcc}')

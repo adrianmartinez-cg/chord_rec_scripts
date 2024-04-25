@@ -654,7 +654,7 @@ for expectedLabel in errorsDict:
 testCasesFolder = 'test_cases_lab'
 testCasesExpected = os.path.join(dir,testCasesFolder,'expected')
 testCasesPredicted = os.path.join(dir,testCasesFolder,'predicted')
-file = '3.lab'
+file = '4.lab'
 expectedFile = os.path.join(testCasesExpected,file)
 predictedFile = os.path.join(testCasesPredicted,file)
 testErrorsDict = {}

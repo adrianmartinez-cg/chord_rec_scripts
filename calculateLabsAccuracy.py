@@ -488,7 +488,7 @@ def getMeanPerformance(expectedFolder, predictedFolder,errorsDict,successDict,mi
             if os.path.splitext(file)[1] == ".lab":
                 if os.path.exists(os.path.join(predictedFolder,file)):
                     performance = getPerformance(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,successDict,minRightExtensions,relaxType)
-                    files_.append(performance,file)
+                    files_.append((performance,file))
     sortedFiles = sorted(files_,key=lambda x: x[0]['f1'], reverse=True)
     return sortedFiles
 

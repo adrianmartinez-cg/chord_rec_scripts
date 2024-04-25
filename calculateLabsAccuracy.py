@@ -349,7 +349,7 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minRightE
     if len(expectedChordComponents) > 1:
         rootExpected, annotationExpected = expectedChordComponents
     else:
-        rootExpected = expectedChordComponents
+        rootExpected = expectedChordComponents[0]
         annotationExpected = 'maj'
     predictedChordInfo = chordsDict[annotationPredicted]
     expectedChordInfo = chordsDict[annotationExpected]
@@ -654,7 +654,7 @@ for expectedLabel in errorsDict:
 testCasesFolder = 'test_cases_lab'
 testCasesExpected = os.path.join(dir,testCasesFolder,'expected')
 testCasesPredicted = os.path.join(dir,testCasesFolder,'predicted')
-file = '1.lab'
+file = '3.lab'
 expectedFile = os.path.join(testCasesExpected,file)
 predictedFile = os.path.join(testCasesPredicted,file)
 testErrorsDict = {}

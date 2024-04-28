@@ -200,6 +200,7 @@ def getChordsNotes():
     'maj7(2)/2': {'type': 'maj', 'add_notes': [2, 11], 'bass': 2},
     'maj7(9)/7': {'type': 'maj', 'add_notes': [2, 11], 'bass': 11},
     'maj7/2': {'type': 'maj', 'add_notes': [2,11], 'bass': 2},
+    'maj7/4': {'type': 'maj', 'add_notes': [5,11], 'bass': 5},
     'maj7/3': {'type': 'maj', 'add_notes': [11], 'bass': 4},
     'maj7/5': {'type': 'maj', 'add_notes': [11], 'bass': 7},
     'maj7/7': {'type': 'maj', 'add_notes': [11], 'bass': 11},
@@ -349,33 +350,34 @@ def jaccardScore(predictedChordInfo, expectedChordInfo):
 
    intersection = predictedChordNotes.intersection(expectedChordNotes)
    union = predictedChordNotes.union(expectedChordNotes)
-   print(f'Jaccard between {sorted(list(predictedChordNotes))} {sorted(list(expectedChordNotes))}: {len(intersection) / len(union)}')
+   #print(f'Jaccard between {sorted(list(predictedChordNotes))} {sorted(list(expectedChordNotes))}: {len(intersection) / len(union)}')
    return len(intersection) / len(union)
 
 
-def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore = 0.3, relaxType = False):
+def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore = 0.5, relaxType = False):
+    '''
+      Compares two labels of chords in raw format
+    '''
+    def getComponents(chordLabel):
+      comps = chordLabel.split(":")
+      if len(comps) > 1:
+        root,annotation = comps
+      else:
+        root = comps[0]
+        annotation = 'maj'
+      return root, annotation
+
     chordsDict = getChordsNotes()
     enharmonicNotes = getEnharmonicNotes()
-    predictedChordComponents = predictedLabel.split(":")
-    expectedChordComponents = expectedLabel.split(":")
-    if len(predictedChordComponents) > 1:
-        rootPredicted, annotationPredicted = predictedChordComponents
-    else:
-        rootPredicted = predictedChordComponents[0]
-        annotationPredicted = 'maj'
+    rootPredicted, annotationPredicted = getComponents(predictedLabel)
+    rootExpected, annotationExpected = getComponents(expectedLabel)
     altrootPredicted = enharmonicNotes[rootPredicted]
-    if len(expectedChordComponents) > 1:
-        rootExpected, annotationExpected = expectedChordComponents
-    else:
-        rootExpected = expectedChordComponents[0]
-        annotationExpected = 'maj'
     predictedChordInfo = chordsDict[annotationPredicted]
     expectedChordInfo = chordsDict[annotationExpected]
     equalTypes = predictedChordInfo['type'] == expectedChordInfo['type']
     equalRoots = rootPredicted == rootExpected or altrootPredicted == rootExpected
     predictedChordExtensions = predictedChordInfo['add_notes']
     expectedChordExtensions = expectedChordInfo['add_notes']
-    #extensionsScore = compareExtensions(predictedChordExtensions,expectedChordExtensions)
     extensionsScore = jaccardScore(predictedChordInfo,expectedChordInfo)
     equal = True
     if not equalRoots:
@@ -511,56 +513,65 @@ def getMeanPerformance(expectedFolder, predictedFolder,errorsDict,successDict,mi
     sortedFiles = sorted(files_,key=lambda x: x[0]['f1'], reverse=True)
     return sortedFiles
 
+def getMeanMetrics(filesPerformance):
+  precision_array = np.array([t[0]['precision'] for t in filesPerformance])
+  recall_array = np.array([t[0]['recall'] for t in filesPerformance])
+  f1_array = np.array([t[0]['f1'] for t in filesPerformance])
+
+  mean_precision = np.mean(precision_array)
+  mean_recall = np.mean(recall_array)
+  mean_f1 = np.mean(f1_array)
+  return {'precision': mean_precision, 'recall': mean_recall, 'f1': mean_f1}
+
 ## OTHER ##############################################################
 
 def getTypeErrors(errorsDict):
-    def countRepetitions(elem):
+    '''
+    Function to get errors in chord prediction associated with wrong infered chord type
+    '''  
+    def countRepetitions(chordTypeErrors):
       map = {}
-      map['count'] = len(elem)
-      for annotation in elem:
-        if annotation not in map:
-          map[annotation] = 1
+      map['count'] = len(chordTypeErrors)
+      for error in chordTypeErrors:
+        if error not in map:
+          map[error] = 1
         else:
-          map[annotation] += 1
+          map[error] += 1
       return map
 
-    chordQualities = getChordsQualities()
+    # first part: converting errorsDict dictionary to a dictionary containing only chord types 
+    # instead of labels with root + type
     annotationsDictKeys = []
     annotationsDict = {}
-    countingDict = {}
-    simplifiedCountingDict = {}
     for key in errorsDict:
         if extractAnnotation(key) not in annotationsDict:
           annotationsDict[extractAnnotation(key)] = []
         for elem in errorsDict[key]:
             annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
+    # now, for each type of chord, there will be counters associated for each type of error
+    # example: '7': {'9': 10 , 'min7': 5}, means 7 chord was confused with 9th chord 10 times
+    # and min7 chord 5 times
     for key in annotationsDict:
       annotationsDictKeys.append(key)
       annotationsDict[key] = countRepetitions(annotationsDict[key])
     annotationsDictKeys.sort()
+    countingDict = {}
+    simplifiedCountingDict = {}
     for key in annotationsDictKeys:
-      countingDict[key] = annotationsDict[key]
-    for key in countingDict:
-      temp = {}
-      subtract = 0
-      for elem in countingDict[key]:
-        if elem != key:
-          temp[elem] = countingDict[key][elem]
-        else:
-          subtract = countingDict[key][elem]
-      count = countingDict[key]['count'] - subtract
-      countingDict[key] = temp
-      countingDict[key]['count'] = count
+      countingDict[key] = annotationsDict[key]   
+    chordQualities = getChordsQualities()
     for key in countingDict:
       for elem in countingDict[key]:
         if elem == 'count': continue
-        if chordQualities[key] not in simplifiedCountingDict: simplifiedCountingDict[chordQualities[key]] = {}
-        if chordQualities[elem] not in simplifiedCountingDict[chordQualities[key]]: simplifiedCountingDict[chordQualities[key]][chordQualities[elem]] = 0
-        simplifiedCountingDict[chordQualities[key]][chordQualities[elem]] += countingDict[key][elem]
-      simplifiedCountingDict[chordQualities[key]]['count'] = 0
-      for elem in simplifiedCountingDict[chordQualities[key]]:
+        simplifiedKey = chordQualities[key]
+        simplifiedElem = chordQualities[elem]
+        if simplifiedKey not in simplifiedCountingDict: simplifiedCountingDict[simplifiedKey] = {}
+        if simplifiedElem not in simplifiedCountingDict[simplifiedKey]: simplifiedCountingDict[simplifiedKey][simplifiedElem] = 0
+        simplifiedCountingDict[simplifiedKey][simplifiedElem] += countingDict[key][elem]
+      simplifiedCountingDict[simplifiedKey]['count'] = 0
+      for elem in simplifiedCountingDict[simplifiedKey]:
         if elem != 'count':
-          simplifiedCountingDict[chordQualities[key]]['count'] += simplifiedCountingDict[chordQualities[key]][elem]
+          simplifiedCountingDict[simplifiedKey]['count'] += simplifiedCountingDict[simplifiedKey][elem]
     return countingDict,simplifiedCountingDict
 
 def simplifySuccessDict(successDict):
@@ -582,7 +593,7 @@ errorsDict = {}
 successDict = {}
 minScore = 0
 
-'''
+#'''
 files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,errorsDict,successDict,minScore)
 print(f'## {len(files)} Files ##')
 map = {file[1]:file[0]['f1'] for file in files if file[0]['f1'] < 0.6}
@@ -592,6 +603,7 @@ metrics = getMeanMetrics(files)
 print(f'Precision: {metrics["precision"]}')
 print(f'Recall: {metrics["recall"]}')
 print(f'F1: {metrics["f1"]}')
+countingDict , simplifiedCountingDict = getTypeErrors(errorsDict)
 #'''
 
 #createChordChart(os.path.join(dir,'example1.lab'))
@@ -627,12 +639,3 @@ print(f'Min Score [0.5] Accuracy: {testAcc}')
 testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,1)
 print(f'Min Score [1] Accuracy: {testAcc}')
 '''
-
-majchords = []
-all = getChordsNotes()
-for c in all:
-   if all[c]['type'] == 'maj':
-      majchords.append(c)
-print(majchords)
-for c in majchords:
-  jaccardScore(all[c],all["maj"])

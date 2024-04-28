@@ -135,132 +135,132 @@ def getChordsQualities():
       'sus4/4': 'sus4',
   }
 
-def getChordsDict():
-    return {'11': {'type': 'maj', 'extensions': [5,10], 'bass': 0},
-    '7': {'type': 'maj', 'extensions': [10], 'bass': 0},
-    '7(4)': {'type': 'maj', 'extensions': [5, 10], 'bass': 0},
-    '7/2': {'type': 'maj', 'extensions': [10], 'bass': 2},
-    '7/3': {'type': 'maj', 'extensions': [10], 'bass': 4},
-    '7/4': {'type': 'maj', 'extensions': [10], 'bass': 5},
-    '7/5': {'type': 'maj', 'extensions': [10], 'bass': 7},
-    '7/6': {'type': 'maj', 'extensions': [10], 'bass': 9},
-    '7/b2': {'type': 'maj', 'extensions': [10], 'bass': 1},
-    '7/b7': {'type': 'maj', 'extensions': [10], 'bass': 10},
-    '9': {'type': 'maj', 'extensions': [2,10], 'bass': 0},
-    '9(13)': {'type': 'maj', 'extensions': [2, 9, 10], 'bass': 0},
-    '9/3': {'type': 'maj', 'extensions': [2,10], 'bass': 4},
-    '9/5': {'type': 'maj', 'extensions': [2,10], 'bass': 7},
-    '9/b7': {'type': 'maj', 'extensions': [2, 10], 'bass': 10},
-    'aug': {'type': 'aug', 'extensions': [], 'bass': 0},
-    'aug(7)': {'type': 'aug', 'extensions': [11], 'bass': 0},
-    'aug(b7)': {'type': 'aug', 'extensions': [10], 'bass': 0},
-    'dim': {'type': 'dim', 'extensions': [], 'bass': 0},
-    'dim/7': {'type': 'dim', 'extensions': [], 'bass': 11}, #
-    'dim/b2': {'type': 'dim', 'extensions': [], 'bass': 1},
-    'dim/b3': {'type': 'dim', 'extensions': [], 'bass': 3},
-    'dim/b5': {'type': 'dim', 'extensions': [], 'bass': 6},
-    'dim/b7': {'type': 'dim', 'extensions': [], 'bass': 10}, #
-    'dim7': {'type': 'dim', 'extensions': [9], 'bass': 0},
-    'hdim7': {'type': 'dim', 'extensions': [10], 'bass': 0},
-    'hdim7/4': {'type': 'dim', 'extensions': [10], 'bass': 5},
-    'hdim7/b3': {'type': 'dim', 'extensions': [10], 'bass': 3},
-    'hdim7/b5': {'type': 'dim', 'extensions': [10], 'bass': 6},
-    'maj': {'type': 'maj', 'extensions': [], 'bass': 0},
-    'maj(11)': {'type': 'maj', 'extensions': [5], 'bass': 0},
-    'maj(2)/2': {'type': 'maj', 'extensions': [2], 'bass': 2},
-    'maj(4)/4': {'type': 'maj', 'extensions': [5], 'bass': 5},
-    'maj(9)': {'type': 'maj', 'extensions': [2], 'bass': 0},
-    'maj(9)/3': {'type': 'maj', 'extensions': [2], 'bass': 4},
-    'maj(9)/5': {'type': 'maj', 'extensions': [2], 'bass': 7},
-    'maj(9)/6': {'type': 'maj', 'extensions': [2], 'bass': 9},
-    'maj/#4': {'type': 'maj', 'extensions': [], 'bass': 6},
-    'maj/2': {'type': 'maj', 'extensions': [], 'bass': 2},
-    'maj/3': {'type': 'maj', 'extensions': [], 'bass': 4},
-    'maj/4': {'type': 'maj', 'extensions': [], 'bass': 5},
-    'maj/5': {'type': 'maj', 'extensions': [], 'bass': 7},
-    'maj/6': {'type': 'maj', 'extensions': [], 'bass': 9},
-    'maj/7': {'type': 'maj', 'extensions': [], 'bass': 11},
-    'maj/b2': {'type': 'min', 'extensions': [], 'bass': 1},
-    'maj/b3': {'type': 'maj', 'extensions': [], 'bass': 3},
-    'maj/b6': {'type': 'maj', 'extensions': [], 'bass': 8},
-    'maj/b7': {'type': 'maj', 'extensions': [], 'bass': 10},
-    'maj6': {'type': 'maj', 'extensions': [9], 'bass': 0},
-    'maj6(2)/2': {'type': 'maj', 'extensions': [2, 9], 'bass': 2},
-    'maj6(7)': {'type': 'maj', 'extensions': [9, 11], 'bass': 0},
-    'maj6(9)': {'type': 'maj', 'extensions': [2, 9], 'bass': 0},
-    'maj6(9)/3': {'type': 'maj', 'extensions': [2, 9], 'bass': 4},
-    'maj6(9)/5': {'type': 'maj', 'extensions': [2, 9], 'bass': 7},
-    'maj6(b7)': {'type': 'maj', 'extensions': [9, 10], 'bass': 0},
-    'maj6/2': {'type': 'maj', 'extensions': [9], 'bass': 2},
-    'maj6/3': {'type': 'maj', 'extensions': [9], 'bass': 4},
-    'maj6/4': {'type': 'maj', 'extensions': [9], 'bass': 5},
-    'maj6/5': {'type': 'maj', 'extensions': [9], 'bass': 7},
-    'maj6/6': {'type': 'maj', 'extensions': [9], 'bass': 9},
-    'maj7': {'type': 'maj', 'extensions': [11], 'bass': 0},
-    'maj7(2)/2': {'type': 'maj', 'extensions': [2, 11], 'bass': 2},
-    'maj7(9)/7': {'type': 'maj', 'extensions': [2, 11], 'bass': 11},
-    'maj7/2': {'type': 'maj', 'extensions': [11], 'bass': 2},
-    'maj7/3': {'type': 'maj', 'extensions': [11], 'bass': 4},
-    'maj7/5': {'type': 'maj', 'extensions': [11], 'bass': 7},
-    'maj7/7': {'type': 'maj', 'extensions': [11], 'bass': 11},
-    'maj9': {'type': 'maj', 'extensions': [2], 'bass': 0},
-    'maj9(13)': {'type': 'maj', 'extensions': [2, 9], 'bass': 0},
-    'maj9/3': {'type': 'maj', 'extensions': [2], 'bass': 4},
-    'min': {'type': 'min', 'extensions': [], 'bass': 0},
-    'min6': {'type': 'min', 'extensions': [9], 'bass': 0},
-    'min7': {'type': 'min', 'extensions': [10], 'bass': 0},
-    'min(11)': {'type': 'min', 'extensions': [5], 'bass': 0},
-    'min(2)/2': {'type': 'min', 'extensions': [2], 'bass': 2},
-    'min(6)/6': {'type': 'min', 'extensions': [9], 'bass': 9},
-    'min(9)': {'type': 'min', 'extensions': [2], 'bass': 0},
-    'min(9)/5': {'type': 'min', 'extensions': [2], 'bass': 7},
-    'min(9)/b3': {'type': 'min', 'extensions': [2], 'bass': 3},
-    'min/2': {'type': 'min', 'extensions': [], 'bass': 2},
-    'min/4': {'type': 'min', 'extensions': [], 'bass': 5},
-    'min/5': {'type': 'min', 'extensions': [], 'bass': 7},
-    'min/6': {'type': 'min', 'extensions': [], 'bass': 9},
-    'min/7': {'type': 'min', 'extensions': [], 'bass': 11},
-    'min/b3': {'type': 'min', 'extensions': [], 'bass': 3},
-    'min/b6': {'type': 'min', 'extensions': [], 'bass': 8},
-    'min/b7': {'type': 'min', 'extensions': [], 'bass': 10},
-    'min11': {'type': 'min', 'extensions': [5], 'bass': 0},
-    'min11/5': {'type': 'min', 'extensions': [5], 'bass': 7},
-    'min11/b3': {'type': 'min', 'extensions': [5], 'bass': 3},
-    'min11/b7': {'type': 'min', 'extensions': [5], 'bass': 10},
-    'min6(7)': {'type': 'min', 'extensions': [9, 10], 'bass': 0},
-    'min6/2': {'type': 'min', 'extensions': [9], 'bass': 2},
-    'min6/5': {'type': 'min', 'extensions': [9], 'bass': 7},
-    'min6/b3': {'type': 'min', 'extensions': [9], 'bass': 3},
-    'min7(11)': {'type': 'min', 'extensions': [5, 10], 'bass': 0},
-    'min7(13)': {'type': 'min', 'extensions': [9, 10], 'bass': 0},
-    'min7(4)/4': {'type': 'min', 'extensions': [5, 10], 'bass': 5},
-    'min7(4)/b7': {'type': 'min', 'extensions': [5, 10], 'bass': 10},
-    'min7/2': {'type': 'min', 'extensions': [10], 'bass': 2},
-    'min7/4': {'type': 'min', 'extensions': [10], 'bass': 5},
-    'min7/5': {'type': 'min', 'extensions': [10], 'bass': 7},
-    'min7/6': {'type': 'min', 'extensions': [10], 'bass': 9},
-    'min7/b2': {'type': 'min', 'extensions': [10], 'bass': 1},
-    'min7/b3': {'type': 'min', 'extensions': [10], 'bass': 3},
-    'min7/b7': {'type': 'min', 'extensions': [10], 'bass': 10},
-    'min9': {'type': 'min', 'extensions': [2], 'bass': 0},
-    'min9/5': {'type': 'min', 'extensions': [2], 'bass': 7},
-    'min9/b3': {'type': 'min', 'extensions': [2], 'bass': 3},
-    'min9/b7': {'type': 'min', 'extensions': [2], 'bass': 10},
-    'minmaj7': {'type': 'min', 'extensions': [11], 'bass': 0},
-    'minmaj7/5': {'type': 'min', 'extensions': [11], 'bass': 7},
-    'minmaj7/7': {'type': 'min', 'extensions': [11], 'bass': 11},
-    'sus2': {'type': 'sus', 'extensions': [2], 'bass': 0},
-    'sus2(4)': {'type': 'sus', 'extensions': [2, 5], 'bass': 0},
-    'sus2(6)': {'type': 'sus', 'extensions': [2, 9], 'bass': 0},
-    'sus2/5': {'type': 'sus', 'extensions': [2], 'bass': 7},
-    'sus4': {'type': 'sus', 'extensions': [5], 'bass': 0},
-    'sus4(9)': {'type': 'sus', 'extensions': [2, 5], 'bass': 0},
-    'sus4(b7)': {'type': 'sus', 'extensions': [5, 10], 'bass': 0},
-    'sus4(b7)/4': {'type': 'sus', 'extensions': [5, 10], 'bass': 5},
-    'sus4(b7)/b7': {'type': 'sus', 'extensions': [5, 10], 'bass': 10},
-    'sus4(b7,9)': {'type': 'sus', 'extensions': [2, 5, 10], 'bass': 0},
-    'sus4(b7,9,13)': {'type': 'sus', 'extensions': [2, 5, 9, 10], 'bass': 0},
-    'sus4/4': {'type': 'sus', 'extensions': [5], 'bass': 5}
+def getChordsNotes():
+    return {'11': {'type': 'maj', 'add_notes': [5,10], 'bass': 0},
+    '7': {'type': 'maj', 'add_notes': [10], 'bass': 0},
+    '7(4)': {'type': 'maj', 'add_notes': [5, 10], 'bass': 0},
+    '7/2': {'type': 'maj', 'add_notes': [2, 10], 'bass': 2},
+    '7/3': {'type': 'maj', 'add_notes': [10], 'bass': 4},
+    '7/4': {'type': 'maj', 'add_notes': [5,10], 'bass': 5},
+    '7/5': {'type': 'maj', 'add_notes': [10], 'bass': 7},
+    '7/6': {'type': 'maj', 'add_notes': [9,10], 'bass': 9},
+    '7/b2': {'type': 'maj', 'add_notes': [1,10], 'bass': 1},
+    '7/b7': {'type': 'maj', 'add_notes': [10], 'bass': 10},
+    '9': {'type': 'maj', 'add_notes': [2,10], 'bass': 0},
+    '9(13)': {'type': 'maj', 'add_notes': [2, 9, 10], 'bass': 0},
+    '9/3': {'type': 'maj', 'add_notes': [2,10], 'bass': 4},
+    '9/5': {'type': 'maj', 'add_notes': [2,10], 'bass': 7},
+    '9/b7': {'type': 'maj', 'add_notes': [2, 10], 'bass': 10},
+    'aug': {'type': 'aug', 'add_notes': [], 'bass': 0},
+    'aug(7)': {'type': 'aug', 'add_notes': [11], 'bass': 0},
+    'aug(b7)': {'type': 'aug', 'add_notes': [10], 'bass': 0},
+    'dim': {'type': 'dim', 'add_notes': [], 'bass': 0},
+    'dim/7': {'type': 'dim', 'add_notes': [11], 'bass': 11}, #
+    'dim/b2': {'type': 'dim', 'add_notes': [1], 'bass': 1},
+    'dim/b3': {'type': 'dim', 'add_notes': [], 'bass': 3},
+    'dim/b5': {'type': 'dim', 'add_notes': [], 'bass': 6},
+    'dim/b7': {'type': 'dim', 'add_notes': [10], 'bass': 10}, #
+    'dim7': {'type': 'dim', 'add_notes': [9], 'bass': 0},
+    'hdim7': {'type': 'dim', 'add_notes': [10], 'bass': 0},
+    'hdim7/4': {'type': 'dim', 'add_notes': [5,10], 'bass': 5},
+    'hdim7/b3': {'type': 'dim', 'add_notes': [10], 'bass': 3},
+    'hdim7/b5': {'type': 'dim', 'add_notes': [10], 'bass': 6},
+    'maj': {'type': 'maj', 'add_notes': [], 'bass': 0},
+    'maj(11)': {'type': 'maj', 'add_notes': [5], 'bass': 0},
+    'maj(2)/2': {'type': 'maj', 'add_notes': [2], 'bass': 2},
+    'maj(4)/4': {'type': 'maj', 'add_notes': [5], 'bass': 5},
+    'maj(9)': {'type': 'maj', 'add_notes': [2], 'bass': 0},
+    'maj(9)/3': {'type': 'maj', 'add_notes': [2], 'bass': 4},
+    'maj(9)/5': {'type': 'maj', 'add_notes': [2], 'bass': 7},
+    'maj(9)/6': {'type': 'maj', 'add_notes': [2, 9], 'bass': 9},
+    'maj/#4': {'type': 'maj', 'add_notes': [6], 'bass': 6},
+    'maj/2': {'type': 'maj', 'add_notes': [2], 'bass': 2},
+    'maj/3': {'type': 'maj', 'add_notes': [], 'bass': 4},
+    'maj/4': {'type': 'maj', 'add_notes': [5], 'bass': 5},
+    'maj/5': {'type': 'maj', 'add_notes': [], 'bass': 7},
+    'maj/6': {'type': 'maj', 'add_notes': [9], 'bass': 9},
+    'maj/7': {'type': 'maj', 'add_notes': [11], 'bass': 11},
+    'maj/b2': {'type': 'min', 'add_notes': [1], 'bass': 1},
+    'maj/b3': {'type': 'maj', 'add_notes': [3], 'bass': 3},
+    'maj/b6': {'type': 'maj', 'add_notes': [8], 'bass': 8},
+    'maj/b7': {'type': 'maj', 'add_notes': [10], 'bass': 10},
+    'maj6': {'type': 'maj', 'add_notes': [9], 'bass': 0},
+    'maj6(2)/2': {'type': 'maj', 'add_notes': [2, 9], 'bass': 2},
+    'maj6(7)': {'type': 'maj', 'add_notes': [9, 11], 'bass': 0},
+    'maj6(9)': {'type': 'maj', 'add_notes': [2, 9], 'bass': 0},
+    'maj6(9)/3': {'type': 'maj', 'add_notes': [2, 9], 'bass': 4},
+    'maj6(9)/5': {'type': 'maj', 'add_notes': [2, 9], 'bass': 7},
+    'maj6(b7)': {'type': 'maj', 'add_notes': [9, 10], 'bass': 0},
+    'maj6/2': {'type': 'maj', 'add_notes': [2,9], 'bass': 2},
+    'maj6/3': {'type': 'maj', 'add_notes': [9], 'bass': 4},
+    'maj6/4': {'type': 'maj', 'add_notes': [5,9], 'bass': 5},
+    'maj6/5': {'type': 'maj', 'add_notes': [9], 'bass': 7},
+    'maj6/6': {'type': 'maj', 'add_notes': [9], 'bass': 9},
+    'maj7': {'type': 'maj', 'add_notes': [11], 'bass': 0},
+    'maj7(2)/2': {'type': 'maj', 'add_notes': [2, 11], 'bass': 2},
+    'maj7(9)/7': {'type': 'maj', 'add_notes': [2, 11], 'bass': 11},
+    'maj7/2': {'type': 'maj', 'add_notes': [2,11], 'bass': 2},
+    'maj7/3': {'type': 'maj', 'add_notes': [11], 'bass': 4},
+    'maj7/5': {'type': 'maj', 'add_notes': [11], 'bass': 7},
+    'maj7/7': {'type': 'maj', 'add_notes': [11], 'bass': 11},
+    'maj9': {'type': 'maj', 'add_notes': [2], 'bass': 0},
+    'maj9(13)': {'type': 'maj', 'add_notes': [2, 9], 'bass': 0},
+    'maj9/3': {'type': 'maj', 'add_notes': [2], 'bass': 4},
+    'min': {'type': 'min', 'add_notes': [], 'bass': 0},
+    'min6': {'type': 'min', 'add_notes': [9], 'bass': 0},
+    'min7': {'type': 'min', 'add_notes': [10], 'bass': 0},
+    'min(11)': {'type': 'min', 'add_notes': [5], 'bass': 0},
+    'min(2)/2': {'type': 'min', 'add_notes': [2], 'bass': 2},
+    'min(6)/6': {'type': 'min', 'add_notes': [9], 'bass': 9},
+    'min(9)': {'type': 'min', 'add_notes': [2], 'bass': 0},
+    'min(9)/5': {'type': 'min', 'add_notes': [2], 'bass': 7},
+    'min(9)/b3': {'type': 'min', 'add_notes': [2], 'bass': 3},
+    'min/2': {'type': 'min', 'add_notes': [2], 'bass': 2},
+    'min/4': {'type': 'min', 'add_notes': [5], 'bass': 5},
+    'min/5': {'type': 'min', 'add_notes': [], 'bass': 7},
+    'min/6': {'type': 'min', 'add_notes': [9], 'bass': 9},
+    'min/7': {'type': 'min', 'add_notes': [11], 'bass': 11},
+    'min/b3': {'type': 'min', 'add_notes': [], 'bass': 3},
+    'min/b6': {'type': 'min', 'add_notes': [8], 'bass': 8},
+    'min/b7': {'type': 'min', 'add_notes': [10], 'bass': 10},
+    'min11': {'type': 'min', 'add_notes': [5], 'bass': 0},
+    'min11/5': {'type': 'min', 'add_notes': [5], 'bass': 7},
+    'min11/b3': {'type': 'min', 'add_notes': [5], 'bass': 3},
+    'min11/b7': {'type': 'min', 'add_notes': [5,10], 'bass': 10},
+    'min6(7)': {'type': 'min', 'add_notes': [9, 10], 'bass': 0},
+    'min6/2': {'type': 'min', 'add_notes': [2,9], 'bass': 2},
+    'min6/5': {'type': 'min', 'add_notes': [9], 'bass': 7},
+    'min6/b3': {'type': 'min', 'add_notes': [9], 'bass': 3},
+    'min7(11)': {'type': 'min', 'add_notes': [5, 10], 'bass': 0},
+    'min7(13)': {'type': 'min', 'add_notes': [9, 10], 'bass': 0},
+    'min7(4)/4': {'type': 'min', 'add_notes': [5, 10], 'bass': 5},
+    'min7(4)/b7': {'type': 'min', 'add_notes': [5, 10], 'bass': 10},
+    'min7/2': {'type': 'min', 'add_notes': [2,10], 'bass': 2},
+    'min7/4': {'type': 'min', 'add_notes': [5,10], 'bass': 5},
+    'min7/5': {'type': 'min', 'add_notes': [10], 'bass': 7},
+    'min7/6': {'type': 'min', 'add_notes': [9,10], 'bass': 9},
+    'min7/b2': {'type': 'min', 'add_notes': [1,10], 'bass': 1},
+    'min7/b3': {'type': 'min', 'add_notes': [10], 'bass': 3},
+    'min7/b7': {'type': 'min', 'add_notes': [10], 'bass': 10},
+    'min9': {'type': 'min', 'add_notes': [2], 'bass': 0},
+    'min9/5': {'type': 'min', 'add_notes': [2], 'bass': 7},
+    'min9/b3': {'type': 'min', 'add_notes': [2], 'bass': 3},
+    'min9/b7': {'type': 'min', 'add_notes': [2,10], 'bass': 10},
+    'minmaj7': {'type': 'min', 'add_notes': [11], 'bass': 0},
+    'minmaj7/5': {'type': 'min', 'add_notes': [11], 'bass': 7},
+    'minmaj7/7': {'type': 'min', 'add_notes': [11], 'bass': 11},
+    'sus2': {'type': 'sus', 'add_notes': [2], 'bass': 0}, #sus: tonica, quinta (sem terca)
+    'sus2(4)': {'type': 'sus', 'add_notes': [2, 5], 'bass': 0},
+    'sus2(6)': {'type': 'sus', 'add_notes': [2, 9], 'bass': 0},
+    'sus2/5': {'type': 'sus', 'add_notes': [2], 'bass': 7},
+    'sus4': {'type': 'sus', 'add_notes': [5], 'bass': 0},
+    'sus4(9)': {'type': 'sus', 'add_notes': [2, 5], 'bass': 0},
+    'sus4(b7)': {'type': 'sus', 'add_notes': [5, 10], 'bass': 0},
+    'sus4(b7)/4': {'type': 'sus', 'add_notes': [5, 10], 'bass': 5},
+    'sus4(b7)/b7': {'type': 'sus', 'add_notes': [5, 10], 'bass': 10},
+    'sus4(b7,9)': {'type': 'sus', 'add_notes': [2, 5, 10], 'bass': 0},
+    'sus4(b7,9,13)': {'type': 'sus', 'add_notes': [2, 5, 9, 10], 'bass': 0},
+    'sus4/4': {'type': 'sus', 'add_notes': [5], 'bass': 5}
     }
 
 
@@ -334,9 +334,27 @@ def compareExtensions(predictedExtensions, expectedExtensions):
 
     return score
 
+def jaccardScore(predictedChordInfo, expectedChordInfo):
+   basicStructure = {'maj': set([0,4,7]), 
+                     'min': set([0,3,7]), 
+                     'aug': set([0,4,8]), 
+                     'dim': set([0,3,6]), 
+                     'sus': set([0,7])}
+   predictedChordAddNotes = set(predictedChordInfo['add_notes'])
+   predictedChordBasicNotes = basicStructure[predictedChordInfo['type']]
+   predictedChordNotes = predictedChordAddNotes.union(predictedChordBasicNotes)
+   expectedChordAddNotes = set(expectedChordInfo['add_notes'])
+   expectedChordBasicNotes = basicStructure[expectedChordInfo['type']]
+   expectedChordNotes = expectedChordAddNotes.union(expectedChordBasicNotes)
 
-def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minRightExtensions = 0.3, relaxType = False):
-    chordsDict = getChordsDict()
+   intersection = predictedChordNotes.intersection(expectedChordNotes)
+   union = predictedChordNotes.union(expectedChordNotes)
+   print(f'Jaccard between {sorted(list(predictedChordNotes))} {sorted(list(expectedChordNotes))}: {len(intersection) / len(union)}')
+   return len(intersection) / len(union)
+
+
+def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore = 0.3, relaxType = False):
+    chordsDict = getChordsNotes()
     enharmonicNotes = getEnharmonicNotes()
     predictedChordComponents = predictedLabel.split(":")
     expectedChordComponents = expectedLabel.split(":")
@@ -355,15 +373,16 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minRightE
     expectedChordInfo = chordsDict[annotationExpected]
     equalTypes = predictedChordInfo['type'] == expectedChordInfo['type']
     equalRoots = rootPredicted == rootExpected or altrootPredicted == rootExpected
-    predictedChordExtensions = predictedChordInfo['extensions']
-    expectedChordExtensions = expectedChordInfo['extensions']
-    extensionsScore = compareExtensions(predictedChordExtensions,expectedChordExtensions)
+    predictedChordExtensions = predictedChordInfo['add_notes']
+    expectedChordExtensions = expectedChordInfo['add_notes']
+    #extensionsScore = compareExtensions(predictedChordExtensions,expectedChordExtensions)
+    extensionsScore = jaccardScore(predictedChordInfo,expectedChordInfo)
     equal = True
     if not equalRoots:
         equal = False
-    if extensionsScore < minRightExtensions:
-        equal = False
     if not relaxType and not equalTypes:
+        equal = False
+    if extensionsScore < minScore:
         equal = False
     if not equal:
         if expectedLabel not in errorsDict:
@@ -422,7 +441,7 @@ def createChordChart(file_path):
 
 ## CALCULATE PERFORMANCE OF LAB FILES FUNCTIONS #########################
 
-def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict,minRightExtensions = 0.3, relaxType = False):
+def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict,minScore = 0.3, relaxType = False):
     def readLabelsFromFile(file,addPredictedLabel=False):
         firstTimeInstant = 0
         lastTimeInstant = 0
@@ -473,7 +492,7 @@ def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict
         if actualTime == 0 and anteriorTime == 0 : continue # nothing to compute
         expectedChordLabel = getCurrentChordInTimeline(actualTime,expectedTimeLine)
         predictedChordLabel = getCurrentChordInTimeline(actualTime,predictedTimeLine)
-        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,successDict,minRightExtensions,relaxType):
+        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,successDict,minScore,relaxType):
             coloredLength += actualTime - anteriorTime
     recall = coloredLength / fullColoredLength
     precision = coloredLength / (endTimePredicted - startTimePredicted)
@@ -481,13 +500,13 @@ def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict
     return {'recall': recall , 'precision': precision , 'f1': f1}
 
 
-def getMeanPerformance(expectedFolder, predictedFolder,errorsDict,successDict,minRightExtensions=0.3, relaxType = False):
+def getMeanPerformance(expectedFolder, predictedFolder,errorsDict,successDict,minScore=0.3, relaxType = False):
     files_ = []
     for dir, subDir, files in os.walk(expectedFolder):
         for file in files:
             if os.path.splitext(file)[1] == ".lab":
                 if os.path.exists(os.path.join(predictedFolder,file)):
-                    performance = getPerformance(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,successDict,minRightExtensions,relaxType)
+                    performance = getPerformance(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,successDict,minScore,relaxType)
                     files_.append((performance,file))
     sortedFiles = sorted(files_,key=lambda x: x[0]['f1'], reverse=True)
     return sortedFiles
@@ -554,23 +573,25 @@ def simplifySuccessDict(successDict):
       simplified[chordQualities[extractAnnotation(key)]] += successDict[key]
   return simplified
 
-dir = os.getcwd()
-resultsFolder = 'comp_transformer'
-datasetFolder = 'pop909'
-expectedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_expected'))
-predictedLabelsDir = os.path.abspath(os.path.join(dir,'..','resultados',resultsFolder,f'{datasetFolder}_predicted'))
+rootDir = os.getcwd()
+resultsFolder = os.path.join(rootDir,'results','pop909')
+expectedLabelsDir = os.path.join(resultsFolder,'expected')
+modelFolder = 'btc-ismir19'
+predictedLabelsDir = os.path.join(resultsFolder,modelFolder)
 errorsDict = {}
+successDict = {}
+minScore = 0
 
 '''
-files, accuracy = getMeanColoringAccuracy(expectedLabelsDir,predictedLabelsDir,errorsDict,0.24)
-print(f'####### {len(files)} Files #########')
-map = {file[1]:file[0] for file in files if file[0] < 0.6}
+files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,errorsDict,successDict,minScore)
+print(f'## {len(files)} Files ##')
+map = {file[1]:file[0]['f1'] for file in files if file[0]['f1'] < 0.6}
 print(map)
-print('\n####### Accuracy (Expected) #########')
-print(accuracy)
-typeErrors, simplifiedTypeErrors = getTypeErrors(errorsDict)
-for expectedLabel in errorsDict:
-  print(f'{expectedLabel}: {errorsDict[expectedLabel]}')
+print('\n## Metrics ##')
+metrics = getMeanMetrics(files)
+print(f'Precision: {metrics["precision"]}')
+print(f'Recall: {metrics["recall"]}')
+print(f'F1: {metrics["f1"]}')
 #'''
 
 #createChordChart(os.path.join(dir,'example1.lab'))
@@ -585,6 +606,7 @@ for expectedLabel in errorsDict:
 
 
 ####################### Test Cases
+'''
 testCasesFolder = 'test_cases_lab'
 testCasesExpected = os.path.join(dir,testCasesFolder,'expected')
 testCasesPredicted = os.path.join(dir,testCasesFolder,'predicted')
@@ -604,3 +626,13 @@ print(f'Min Score [0.5] Accuracy: {testAcc}')
 
 testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,1)
 print(f'Min Score [1] Accuracy: {testAcc}')
+'''
+
+majchords = []
+all = getChordsNotes()
+for c in all:
+   if all[c]['type'] == 'maj':
+      majchords.append(c)
+print(majchords)
+for c in majchords:
+  jaccardScore(all[c],all["maj"])

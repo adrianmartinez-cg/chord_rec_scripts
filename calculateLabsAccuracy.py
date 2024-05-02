@@ -1,7 +1,7 @@
 import os
-import re
 import numpy as np
 import matplotlib.pyplot as plt
+
 ## Chord Functions #####################################################
 
 def getSimplifiedChords():
@@ -142,7 +142,8 @@ def getChordsQualities():
   }
 
 def getChordsNotes():
-    return {'11': {'type': 'maj', 'add_notes': [5,10], 'bass': 0},
+    return {'N': {'type': 'none', 'add_notes': [], 'bass': 0},
+    '11': {'type': 'maj', 'add_notes': [5,10], 'bass': 0},
     '7': {'type': 'maj', 'add_notes': [10], 'bass': 0},
     '7(4)': {'type': 'maj', 'add_notes': [5, 10], 'bass': 0},
     '7/2': {'type': 'maj', 'add_notes': [2, 10], 'bass': 2},
@@ -298,6 +299,8 @@ def getEnharmonicNotes():
     }
 
 def extractAnnotation(chordLabel):
+  if chordLabel == 'N':
+     return 'N'
   comps = chordLabel.split(":")
   if len(comps) > 1:
     _,annotation = comps
@@ -328,7 +331,8 @@ def jaccardScore(predictedChordInfo, expectedChordInfo):
                      'min': set([0,3,7]), 
                      'aug': set([0,4,8]), 
                      'dim': set([0,3,6]), 
-                     'sus': set([0,7])}
+                     'sus': set([0,7]),
+                     'none': set([0])}
    predictedChordAddNotes = set(predictedChordInfo['add_notes'])
    predictedChordBasicNotes = basicStructure[predictedChordInfo['type']]
    predictedChordNotes = predictedChordAddNotes.union(predictedChordBasicNotes)
@@ -338,14 +342,15 @@ def jaccardScore(predictedChordInfo, expectedChordInfo):
 
    intersection = predictedChordNotes.intersection(expectedChordNotes)
    union = predictedChordNotes.union(expectedChordNotes)
-   #print(f'Jaccard between {sorted(list(predictedChordNotes))} {sorted(list(expectedChordNotes))}: {len(intersection) / len(union)}')
    return len(intersection) / len(union)
 
-def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore = 0.5, relaxType = False):
+def compareChords(predictedLabel,expectedLabel, typeErrorsDict,successDict,minScore = 0.5, relaxType = False):
     '''
       Compares two labels of chords in raw format
     '''
     def getComponents(chordLabel):
+      if chordLabel == 'N':
+         return 'N','N'
       comps = chordLabel.split(":")
       if len(comps) > 1:
         root,annotation = comps
@@ -371,16 +376,22 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore 
         equal = False
     if similarityScore < minScore:
         equal = False
-    if not equal:
-        if expectedLabel not in errorsDict:
-            errorsDict[expectedLabel] = [predictedLabel]
-        else:
-            errorsDict[expectedLabel].append(predictedLabel)
-    else:
-      if expectedLabel not in successDict:
-        successDict[expectedLabel] = 1
+    if expectedLabel != 'N' and predictedLabel != 'N':
+      chordQualities = getChordsQualities()
+      simplifiedExpectedChordType = chordQualities[extractAnnotation(expectedLabel)]
+      simplifiedPredictedChordType = chordQualities[extractAnnotation(predictedLabel)]
+      if not equal:
+          if simplifiedExpectedChordType not in typeErrorsDict:
+            typeErrorsDict[simplifiedExpectedChordType] = {}
+          if simplifiedPredictedChordType not in typeErrorsDict[simplifiedExpectedChordType]:
+            typeErrorsDict[simplifiedExpectedChordType][simplifiedPredictedChordType] = 1
+          else:
+            typeErrorsDict[simplifiedExpectedChordType][simplifiedPredictedChordType] += 1
       else:
-        successDict[expectedLabel] += 1
+        if simplifiedExpectedChordType not in successDict:
+          successDict[simplifiedExpectedChordType] = 1
+        else:
+          successDict[simplifiedExpectedChordType] += 1
     return equal
 
 def createChordChart(file_path):
@@ -428,7 +439,7 @@ def createChordChart(file_path):
 
 ## CALCULATE PERFORMANCE OF LAB FILES FUNCTIONS #########################
 
-def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict,minScore = 0.3, relaxType = False):
+def getPerformance(expectedLabelsFile,predictedLabelsFile,typeErrorsDict,chordCoverage, successDict,minScore = 0.3, relaxType = False):
     def readLabelsFromFile(file,addPredictedLabel=False):
         firstTimeInstant = 0
         lastTimeInstant = 0
@@ -462,6 +473,7 @@ def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict
                 break
         return chord
 
+    chordQualities = getChordsQualities()
     timeLine = []
     expectedTimeLine = []
     predictedTimeLine = []
@@ -470,6 +482,8 @@ def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict
     timeLine.sort()
     fullColoredLength = endTimeExpected - startTimeExpected
     coloredLength = 0
+    coloredLengthByChord = {}
+    uncoloredLengthByChord = {}
     for i in range(len(timeLine)):
         actualTime = timeLine[i][0]
         if i == 0:
@@ -479,21 +493,38 @@ def getPerformance(expectedLabelsFile,predictedLabelsFile,errorsDict,successDict
         if actualTime == 0 and anteriorTime == 0 : continue # nothing to compute
         expectedChordLabel = getCurrentChordInTimeline(actualTime,expectedTimeLine)
         predictedChordLabel = getCurrentChordInTimeline(actualTime,predictedTimeLine)
-        if compareChords(predictedChordLabel,expectedChordLabel,errorsDict,successDict,minScore,relaxType):
-            coloredLength += actualTime - anteriorTime
+        simplifiedChordType = chordQualities.get(extractAnnotation(expectedChordLabel),'N')
+        if compareChords(predictedChordLabel,expectedChordLabel,typeErrorsDict,successDict,minScore,relaxType):
+            coloredLength += actualTime - anteriorTime       
+            if simplifiedChordType not in coloredLengthByChord:
+               coloredLengthByChord[simplifiedChordType] = actualTime - anteriorTime
+            else:
+               coloredLengthByChord[simplifiedChordType] += actualTime - anteriorTime
+        else:
+           if simplifiedChordType not in uncoloredLengthByChord:
+              uncoloredLengthByChord[simplifiedChordType] = actualTime - anteriorTime
+           else:
+              uncoloredLengthByChord[simplifiedChordType] += actualTime - anteriorTime
+    for chord in uncoloredLengthByChord:
+       if chord == 'N': continue
+       if chord not in chordCoverage:
+          chordCoverage[chord] = {'covered': coloredLengthByChord.get(chord,0), 
+                                  'total': coloredLengthByChord.get(chord,0) + uncoloredLengthByChord.get(chord,0)}
+       else:
+          chordCoverage[chord]['covered'] += coloredLengthByChord.get(chord,0)
+          chordCoverage[chord]['total'] += coloredLengthByChord.get(chord,0) + uncoloredLengthByChord.get(chord,0)
     recall = coloredLength / fullColoredLength
     precision = coloredLength / (endTimePredicted - startTimePredicted)
     f1 = (2*precision*recall) / (precision + recall)
     return {'recall': recall , 'precision': precision , 'f1': f1}
 
-
-def getMeanPerformance(expectedFolder, predictedFolder,errorsDict,successDict,minScore=0.3, relaxType = False):
+def getMeanPerformance(expectedFolder, predictedFolder,typeErrorsDict,chordCoverage, successDict,minScore=0.3, relaxType = False):
     files_ = []
     for dir, subDir, files in os.walk(expectedFolder):
         for file in files:
             if os.path.splitext(file)[1] == ".lab":
                 if os.path.exists(os.path.join(predictedFolder,file)):
-                    performance = getPerformance(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),errorsDict,successDict,minScore,relaxType)
+                    performance = getPerformance(os.path.join(expectedFolder,file),os.path.join(predictedFolder,file),typeErrorsDict,chordCoverage,successDict,minScore,relaxType)
                     files_.append((performance,file))
     sortedFiles = sorted(files_,key=lambda x: x[0]['f1'], reverse=True)
     return sortedFiles
@@ -502,86 +533,23 @@ def getMeanMetrics(filesPerformance):
   precision_array = np.array([t[0]['precision'] for t in filesPerformance])
   recall_array = np.array([t[0]['recall'] for t in filesPerformance])
   f1_array = np.array([t[0]['f1'] for t in filesPerformance])
-
   mean_precision = np.mean(precision_array)
   mean_recall = np.mean(recall_array)
   mean_f1 = np.mean(f1_array)
   return {'precision': mean_precision, 'recall': mean_recall, 'f1': mean_f1}
-
-## OTHER ##############################################################
-
-def getTypeErrors(errorsDict):
-    '''
-    Function to get errors in chord prediction associated with wrong infered chord type
-    '''  
-    def countRepetitions(chordTypeErrors):
-      map = {}
-      map['count'] = len(chordTypeErrors)
-      for error in chordTypeErrors:
-        if error not in map:
-          map[error] = 1
-        else:
-          map[error] += 1
-      return map
-
-    # first part: converting errorsDict dictionary to a dictionary containing only chord types 
-    # instead of labels with root + type
-    annotationsDictKeys = []
-    annotationsDict = {}
-    for key in errorsDict:
-        if extractAnnotation(key) not in annotationsDict:
-          annotationsDict[extractAnnotation(key)] = []
-        for elem in errorsDict[key]:
-            annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
-    # now, for each type of chord, there will be counters associated for each type of error
-    # example: '7': {'9': 10 , 'min7': 5}, means 7 chord was confused with 9th chord 10 times
-    # and min7 chord 5 times. Then it will have its keys sorted and passed to another dict.
-    for key in annotationsDict:
-      annotationsDictKeys.append(key)
-      annotationsDict[key] = countRepetitions(annotationsDict[key])
-    annotationsDictKeys.sort()
-    countingDict = {}
-    simplifiedCountingDict = {}
-    for key in annotationsDictKeys:
-      countingDict[key] = annotationsDict[key]
-    # Now, simplifies the notations of the chords to reduce number of categories
-    # and constructs a new dictionary, with the same idea of counting errors 
-    chordQualities = getChordsQualities()
-    for key in countingDict:
-      for elem in countingDict[key]:
-        if elem == 'count': continue
-        simplifiedKey = chordQualities[key]
-        simplifiedElem = chordQualities[elem]
-        if simplifiedKey not in simplifiedCountingDict: simplifiedCountingDict[simplifiedKey] = {}
-        if simplifiedElem not in simplifiedCountingDict[simplifiedKey]: simplifiedCountingDict[simplifiedKey][simplifiedElem] = 0
-        simplifiedCountingDict[simplifiedKey][simplifiedElem] += countingDict[key][elem]
-      simplifiedCountingDict[simplifiedKey]['count'] = 0
-      for elem in simplifiedCountingDict[simplifiedKey]:
-        if elem != 'count':
-          simplifiedCountingDict[simplifiedKey]['count'] += simplifiedCountingDict[simplifiedKey][elem]
-    return countingDict,simplifiedCountingDict
-
-def simplifySuccessDict(successDict):
-  simplified = {}
-  chordQualities = getChordsQualities()
-  for key in successDict:
-    if chordQualities[extractAnnotation(key)] not in simplified:
-      simplified[chordQualities[extractAnnotation(key)]] = successDict[key]
-    else:
-      simplified[chordQualities[extractAnnotation(key)]] += successDict[key]
-  return simplified
 
 rootDir = os.getcwd()
 resultsFolder = os.path.join(rootDir,'results','pop909')
 expectedLabelsDir = os.path.join(resultsFolder,'expected')
 modelFolder = 'btc-ismir19'
 predictedLabelsDir = os.path.join(resultsFolder,modelFolder)
-errorsDict = {}
+typeErrorsDict = {}
+chordCoverage = {}
 successDict = {}
-minScore = 0
+minScore = 1
 
 #'''
-files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,errorsDict,successDict,minScore)
+files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,typeErrorsDict,chordCoverage,successDict,minScore)
 print(f'## {len(files)} Files ##')
 map = {file[1]:file[0]['f1'] for file in files if file[0]['f1'] < 0.6}
 print(map)
@@ -590,20 +558,6 @@ metrics = getMeanMetrics(files)
 print(f'Precision: {metrics["precision"]}')
 print(f'Recall: {metrics["recall"]}')
 print(f'F1: {metrics["f1"]}')
-countingDict , simplifiedCountingDict = getTypeErrors(errorsDict)
-simplifiedSuccessDict = simplifySuccessDict(successDict)
-#'''
-
-#createChordChart(os.path.join(dir,'example1.lab'))
-#createChordChart(os.path.join(dir,'example2.lab'))
-
-#chords = ['A#','B','B:7','B:min7','A#:minmaj7','C:aug']
-#for c in chords:
-    #print(extractChordComponents(c))
-#shiftFiles(expectedLabelsDir,predictedLabelsDir,'queen_lab_expected_shifted')
-#file = "Somebody To Love.lab"
-#shiftIntervals(os.path.join(expectedLabelsDir,file),os.path.join(shiftedLabelsDir,file),shift=2.52)
-
 
 ####################### Test Cases
 '''

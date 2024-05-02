@@ -4,24 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 ## Chord Functions #####################################################
 
+def getSimplifiedChords():
+  simplified = set()
+  chordMapping = getChordsQualities()
+  for chord in chordMapping:
+    simplified.add(chordMapping[chord])
+  return simplified
+
 def getChordsQualities():
-  # Work in progress
   return {
-      '11': '11',
+      '11': '7',
       '7': '7',
-      '7(4)' : '11',
-      '7/2' : '9',
+      '7(4)' : '7',
+      '7/2' : '7',
       '7/3' : '7',
-      '7/4': '11',
+      '7/4': '7',
       '7/5': '7',
       '7/6': '7(13)',
       '7/b2': '7',
       '7/b7': '7',
-      '9' : '9',
-      '9(13)' : '9(13)',
-      '9/3' : '9',
-      '9/5' : '9',
-      '9/b7' : '9',
+      '9' : '7',
+      '9(13)' : '7',
+      '9/3' : '7',
+      '9/5' : '7',
+      '9/b7' : '7',
       'aug': 'aug',
       'aug(7)' : 'aug',
       'aug(b7)' : 'aug',
@@ -31,7 +37,7 @@ def getChordsQualities():
       'dim/b3': 'dim',
       'dim/b5': 'dim',
       'dim/b7': 'dim',
-      'dim7': 'dim7',
+      'dim7': 'dim',
       'hdim7': 'hdim7',
       'hdim7/4': 'hdim7',
       'hdim7/b3': 'hdim7',
@@ -44,17 +50,17 @@ def getChordsQualities():
       'maj(9)/3': 'maj9',
       'maj(9)/5': 'maj9',
       'maj(9)/6': 'maj9(13)',
-      'maj/#4': 'maj(#11)',
+      'maj/#4': 'maj',
       'maj/2': 'maj9',
       'maj/3': 'maj',
       'maj/4': 'maj(11)',
       'maj/5': 'maj',
       'maj/6': 'maj6',
       'maj/7': 'maj7',
-      'maj/b2': 'maj(b2)',
-      'maj/b3': 'maj(b3)',
-      'maj/b6': 'maj(b13)',
-      'maj/b7': 'maj(b7)',
+      'maj/b2': 'maj',
+      'maj/b3': 'maj',
+      'maj/b6': 'maj',
+      'maj/b7': 'maj/b7',
       'maj6': 'maj6',
       'maj6(2)/2': 'maj9(13)',
       'maj6(7)': 'maj7(13)',
@@ -64,15 +70,15 @@ def getChordsQualities():
       'maj6(b7)': '7(13)',
       'maj6/2': 'maj9(13)',
       'maj6/3': 'maj6',
-      'maj6/4': 'maj(11)(13)',
+      'maj6/4': 'maj6',
       'maj6/5': 'maj6',
       'maj6/6': 'maj6',
       'maj7': 'maj7',
-      'maj7(2)/2': 'maj7(9)',
-      'maj7(9)/7': 'maj7(9)',
-      'maj7/2': 'maj7(9)',
+      'maj7(2)/2': 'maj7',
+      'maj7(9)/7': 'maj7',
+      'maj7/2': 'maj7',
       'maj7/3': 'maj7',
-      'maj7/4': 'maj7(11)',
+      'maj7/4': 'maj7',
       'maj7/5': 'maj7',
       'maj7/7': 'maj7',
       'maj9': 'maj9',
@@ -93,34 +99,34 @@ def getChordsQualities():
       'min/6': 'min6',
       'min/7': 'min7',
       'min/b3': 'min',
-      'min/b6': 'min(b13)',
+      'min/b6': 'min',
       'min/b7': 'min7',
       'min11': 'min(11)',
       'min11/5': 'min(11)',
       'min11/b3': 'min(11)',
-      'min11/b7': 'min7(11)',
-      'min6(7)': 'min7(13)',
-      'min6/2': 'min9(13)',
+      'min11/b7': 'min(11)',
+      'min6(7)': 'min7',
+      'min6/2': 'min9',
       'min6/5': 'min6',
       'min6/b3': 'min6',
       'min7(11)': 'min7(11)',
-      'min7(13)': 'min7(13)',
+      'min7(13)': 'min7',
       'min7(4)/4': 'min7(11)',
       'min7(4)/b7': 'min7(11)',
-      'min7/2': 'min7(9)',
+      'min7/2': 'min7',
       'min7/4': 'min7(11)',
       'min7/5': 'min7',
-      'min7/6': 'min7(13)',
+      'min7/6': 'min7',
       'min7/b2': 'min7',
       'min7/b3': 'min7',
       'min7/b7': 'min7',
       'min9': 'min9',
       'min9/5': 'min9',
       'min9/b3': 'min9',
-      'min9/b7': 'min7(9)',
-      'minmaj7': 'minmaj7',
-      'minmaj7/5': 'minmaj7',
-      'minmaj7/7': 'minmaj7',
+      'min9/b7': 'min9',
+      'minmaj7': 'min',
+      'minmaj7/5': 'min',
+      'minmaj7/7': 'min',
       'sus2': 'sus2',
       'sus2(4)': 'sus2',
       'sus2(6)': 'sus2',
@@ -264,33 +270,6 @@ def getChordsNotes():
     'sus4/4': {'type': 'sus', 'add_notes': [5], 'bass': 5}
     }
 
-
-def extractAnnotation(chordLabel):
-  comps = chordLabel.split(":")
-  if len(comps) > 1:
-    _,annotation = comps
-  else:
-    annotation = 'maj'
-  return annotation
-
-def getAllChordLabelsInFolder(labelsFolder):
-    chords = {}
-    for file in os.listdir(labelsFolder):
-        if file.endswith('.lab'):
-            with open(os.path.join(labelsFolder,file), "r") as labelFile:
-                lines = labelFile.readlines()
-            for line in lines:
-                _,_,chord = line.split()
-                comps = chord.split(":")
-                if len(comps) > 1:
-                    count = chords.setdefault(comps[1],0)
-                    chords[comps[1]] = count + 1
-                else:
-                    if chord != 'N':
-                        count = chords.setdefault('maj',0)
-                        chords['maj'] = count + 1
-    return chords
-
 def getEnharmonicNotes():
     return {
     'B#': 'C',
@@ -318,22 +297,31 @@ def getEnharmonicNotes():
     '': ''
     }
 
-def compareExtensions(predictedExtensions, expectedExtensions):
-    if len(expectedExtensions) == 0:
-        # for len = 0,1,2 : scores 1 ,0.5, 0.25 
-        return 2 ** (-len(predictedExtensions))
-    expectedExtensions = set(expectedExtensions)
-    predictedExtensions = set(predictedExtensions)
+def extractAnnotation(chordLabel):
+  comps = chordLabel.split(":")
+  if len(comps) > 1:
+    _,annotation = comps
+  else:
+    annotation = 'maj'
+  return annotation
 
-    # Calculate intersection and difference
-    correct = expectedExtensions.intersection(predictedExtensions)
-    incorrect = predictedExtensions.difference(expectedExtensions)
-    missing = expectedExtensions.difference(predictedExtensions)
-
-    # Calculates score
-    score = len(correct) / (len(correct) + len(incorrect) + len(missing))
-
-    return score
+def getAllChordLabelsInFolder(labelsFolder):
+    chords = {}
+    for file in os.listdir(labelsFolder):
+        if file.endswith('.lab'):
+            with open(os.path.join(labelsFolder,file), "r") as labelFile:
+                lines = labelFile.readlines()
+            for line in lines:
+                _,_,chord = line.split()
+                comps = chord.split(":")
+                if len(comps) > 1:
+                    count = chords.setdefault(comps[1],0)
+                    chords[comps[1]] = count + 1
+                else:
+                    if chord != 'N':
+                        count = chords.setdefault('maj',0)
+                        chords['maj'] = count + 1
+    return chords
 
 def jaccardScore(predictedChordInfo, expectedChordInfo):
    basicStructure = {'maj': set([0,4,7]), 
@@ -352,7 +340,6 @@ def jaccardScore(predictedChordInfo, expectedChordInfo):
    union = predictedChordNotes.union(expectedChordNotes)
    #print(f'Jaccard between {sorted(list(predictedChordNotes))} {sorted(list(expectedChordNotes))}: {len(intersection) / len(union)}')
    return len(intersection) / len(union)
-
 
 def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore = 0.5, relaxType = False):
     '''
@@ -376,15 +363,13 @@ def compareChords(predictedLabel,expectedLabel, errorsDict,successDict,minScore 
     expectedChordInfo = chordsDict[annotationExpected]
     equalTypes = predictedChordInfo['type'] == expectedChordInfo['type']
     equalRoots = rootPredicted == rootExpected or altrootPredicted == rootExpected
-    predictedChordExtensions = predictedChordInfo['add_notes']
-    expectedChordExtensions = expectedChordInfo['add_notes']
-    extensionsScore = jaccardScore(predictedChordInfo,expectedChordInfo)
+    similarityScore = jaccardScore(predictedChordInfo,expectedChordInfo)
     equal = True
     if not equalRoots:
         equal = False
     if not relaxType and not equalTypes:
         equal = False
-    if extensionsScore < minScore:
+    if similarityScore < minScore:
         equal = False
     if not equal:
         if expectedLabel not in errorsDict:
@@ -550,7 +535,7 @@ def getTypeErrors(errorsDict):
             annotationsDict[extractAnnotation(key)].append(extractAnnotation(elem))
     # now, for each type of chord, there will be counters associated for each type of error
     # example: '7': {'9': 10 , 'min7': 5}, means 7 chord was confused with 9th chord 10 times
-    # and min7 chord 5 times
+    # and min7 chord 5 times. Then it will have its keys sorted and passed to another dict.
     for key in annotationsDict:
       annotationsDictKeys.append(key)
       annotationsDict[key] = countRepetitions(annotationsDict[key])
@@ -558,7 +543,9 @@ def getTypeErrors(errorsDict):
     countingDict = {}
     simplifiedCountingDict = {}
     for key in annotationsDictKeys:
-      countingDict[key] = annotationsDict[key]   
+      countingDict[key] = annotationsDict[key]
+    # Now, simplifies the notations of the chords to reduce number of categories
+    # and constructs a new dictionary, with the same idea of counting errors 
     chordQualities = getChordsQualities()
     for key in countingDict:
       for elem in countingDict[key]:
@@ -604,6 +591,7 @@ print(f'Precision: {metrics["precision"]}')
 print(f'Recall: {metrics["recall"]}')
 print(f'F1: {metrics["f1"]}')
 countingDict , simplifiedCountingDict = getTypeErrors(errorsDict)
+simplifiedSuccessDict = simplifySuccessDict(successDict)
 #'''
 
 #createChordChart(os.path.join(dir,'example1.lab'))

@@ -1,6 +1,7 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+import re
 
 ## Chord Functions #####################################################
 
@@ -541,15 +542,15 @@ def getMeanMetrics(filesPerformance):
 rootDir = os.getcwd()
 resultsFolder = os.path.join(rootDir,'results','pop909')
 expectedLabelsDir = os.path.join(resultsFolder,'expected')
-modelFolder = 'btc-ismir19'
+modelFolder = 'chordino_shifted'
 predictedLabelsDir = os.path.join(resultsFolder,modelFolder)
 typeErrorsDict = {}
 chordCoverage = {}
 successDict = {}
-minScore = 1
+minScore = 0
 
 #'''
-files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,typeErrorsDict,chordCoverage,successDict,minScore)
+files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,typeErrorsDict,chordCoverage,successDict,minScore,relaxType=True)
 print(f'## {len(files)} Files ##')
 map = {file[1]:file[0]['f1'] for file in files if file[0]['f1'] < 0.6}
 print(map)
@@ -580,4 +581,4 @@ print(f'Min Score [0.5] Accuracy: {testAcc}')
 
 testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,1)
 print(f'Min Score [1] Accuracy: {testAcc}')
-'''
+#'''

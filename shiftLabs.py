@@ -1,3 +1,4 @@
+import os
 ## SHIFT .LAB FUNCTIONS ############################################
 
 def shiftIntervals(inputFile, outputFile, shift):
@@ -58,3 +59,10 @@ def shiftFiles(expectedFolder, resultFolder, outputFolder):
                 # Shift the expected file and save it to the output folder
                 outputFilePath = os.path.join(outputFolder, expectedFile)
                 shiftIntervals(expectedFilePath, outputFilePath, shift)
+
+rootDir = os.getcwd()
+resultsFolder = os.path.join(rootDir,'results','pop909')
+expectedLabelsDir = os.path.join(resultsFolder,'expected')
+predictedLabelsDir = os.path.join(resultsFolder,'chordino_corrected')
+shiftedLabelsDir = os.path.join(resultsFolder,'chordino_shifted')
+shiftFiles(predictedLabelsDir,expectedLabelsDir,shiftedLabelsDir)

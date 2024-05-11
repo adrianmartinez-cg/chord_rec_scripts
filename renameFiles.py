@@ -1,12 +1,9 @@
 import os
 
-# Defina o caminho da pasta onde os arquivos estão localizados
 pasta = os.path.join(os.getcwd(),'pop909_expected')
 
-# Itere sobre os arquivos na pasta
 for nome_arquivo in os.listdir(pasta):
     if nome_arquivo.endswith('.txt'):
-        # Extraia a parte numérica do nome do arquivo
         parte_numerica = nome_arquivo.split('_')[0]
         try:
             novo_nome = f"{parte_numerica}.lab"

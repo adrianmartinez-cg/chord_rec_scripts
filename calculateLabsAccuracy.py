@@ -549,7 +549,6 @@ chordCoverage = {}
 successDict = {}
 minScore = 0
 
-#'''
 files = getMeanPerformance(expectedLabelsDir,predictedLabelsDir,typeErrorsDict,chordCoverage,successDict,minScore,relaxType=True)
 print(f'## {len(files)} Files ##')
 map = {file[1]:file[0]['f1'] for file in files if file[0]['f1'] < 0.6}
@@ -559,26 +558,3 @@ metrics = getMeanMetrics(files)
 print(f'Precision: {metrics["precision"]}')
 print(f'Recall: {metrics["recall"]}')
 print(f'F1: {metrics["f1"]}')
-
-####################### Test Cases
-'''
-testCasesFolder = 'test_cases_lab'
-testCasesExpected = os.path.join(dir,testCasesFolder,'expected')
-testCasesPredicted = os.path.join(dir,testCasesFolder,'predicted')
-file = '4.lab'
-expectedFile = os.path.join(testCasesExpected,file)
-predictedFile = os.path.join(testCasesPredicted,file)
-testErrorsDict = {}
-testSuccessDict = {}
-testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0)
-print(f'Min Score [0] Accuracy: {testAcc}')
-
-testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0.25)
-print(f'Min Score [0.25] Accuracy: {testAcc}')
-
-testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,0.5)
-print(f'Min Score [0.5] Accuracy: {testAcc}')
-
-testAcc = getPerformance(expectedFile,predictedFile,testErrorsDict,testSuccessDict,1)
-print(f'Min Score [1] Accuracy: {testAcc}')
-#'''

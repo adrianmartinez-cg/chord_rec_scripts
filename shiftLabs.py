@@ -14,16 +14,13 @@ def shiftIntervals(inputFile, outputFile, shift):
             f.write(newLine)
 
 def calculateShift(predictedFile, expectedFile):
-    # Open and read the first line of the predictedFile
     with open(predictedFile, 'r') as pf:
         predictedFirstLine = pf.readline().strip().split()
 
-    # Open and read the first line of the expectedFile
     with open(expectedFile, 'r') as ef:
         expectedFirstLine = ef.readline().strip().split()
     
     if predictedFirstLine[2] == expectedFirstLine[2]:
-        # Extract end times from the lines
         predictedEndTime = float(predictedFirstLine[1])
         expectedEndTime = float(expectedFirstLine[1])
         # Calculate the shift
@@ -41,17 +38,14 @@ def calculateShift(predictedFile, expectedFile):
     return shift
 
 def shiftFiles(expectedFolder, resultFolder, outputFolder):
-    # Create output folder if it doesn't exist
     if not os.path.exists(outputFolder):
         os.makedirs(outputFolder)
 
-    # Iterate over files in the expected folder
     for expectedFile in os.listdir(expectedFolder):
         if os.path.splitext(expectedFile)[1] == ".lab":
             expectedFilePath = os.path.join(expectedFolder, expectedFile)
             resultFilePath = os.path.join(resultFolder, expectedFile)
 
-            # Check if the corresponding file exists in the result folder
             if os.path.exists(resultFilePath):
                 # Calculate the shift
                 shift = calculateShift(resultFilePath, expectedFilePath)
